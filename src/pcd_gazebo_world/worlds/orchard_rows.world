@@ -1,0 +1,2013 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="orchard_world">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <model name="tree_r00_t000">
+      <static>true</static>
+      <pose>1.628047 -12.372685 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r00_t001">
+      <static>true</static>
+      <pose>5.612924 -12.720177 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r00_t002">
+      <static>true</static>
+      <pose>9.597802 -13.067669 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r00_t003">
+      <static>true</static>
+      <pose>13.582680 -13.415161 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r00_t004">
+      <static>true</static>
+      <pose>17.567557 -13.762653 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r00_t005">
+      <static>true</static>
+      <pose>21.552435 -14.110145 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r00_t006">
+      <static>true</static>
+      <pose>25.537312 -14.457637 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r00_t007">
+      <static>true</static>
+      <pose>29.522190 -14.805128 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r00_t008">
+      <static>true</static>
+      <pose>33.507067 -15.152620 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r00_t009">
+      <static>true</static>
+      <pose>37.491945 -15.500112 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r01_t000">
+      <static>true</static>
+      <pose>-3.090552 -8.347535 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r01_t001">
+      <static>true</static>
+      <pose>0.894326 -8.695027 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r01_t002">
+      <static>true</static>
+      <pose>4.879203 -9.042519 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r01_t003">
+      <static>true</static>
+      <pose>8.864081 -9.390011 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r01_t004">
+      <static>true</static>
+      <pose>12.848959 -9.737503 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r01_t005">
+      <static>true</static>
+      <pose>16.833836 -10.084995 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r01_t006">
+      <static>true</static>
+      <pose>20.818714 -10.432487 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r01_t007">
+      <static>true</static>
+      <pose>24.803591 -10.779979 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r01_t008">
+      <static>true</static>
+      <pose>28.788469 -11.127470 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r01_t009">
+      <static>true</static>
+      <pose>32.773347 -11.474962 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r01_t010">
+      <static>true</static>
+      <pose>36.758224 -11.822454 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r02_t000">
+      <static>true</static>
+      <pose>-1.440409 -5.680796 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r02_t001">
+      <static>true</static>
+      <pose>2.544469 -6.028288 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r02_t002">
+      <static>true</static>
+      <pose>6.529346 -6.375779 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r02_t003">
+      <static>true</static>
+      <pose>10.514224 -6.723271 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r02_t004">
+      <static>true</static>
+      <pose>14.499102 -7.070763 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r02_t005">
+      <static>true</static>
+      <pose>18.483979 -7.418255 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r02_t006">
+      <static>true</static>
+      <pose>22.468857 -7.765747 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r02_t007">
+      <static>true</static>
+      <pose>26.453734 -8.113239 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r02_t008">
+      <static>true</static>
+      <pose>30.438612 -8.460731 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r02_t009">
+      <static>true</static>
+      <pose>34.423490 -8.808222 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r03_t000">
+      <static>true</static>
+      <pose>-2.294395 -1.089231 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r03_t001">
+      <static>true</static>
+      <pose>1.690482 -1.436723 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r03_t002">
+      <static>true</static>
+      <pose>5.675360 -1.784215 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r03_t003">
+      <static>true</static>
+      <pose>9.660237 -2.131707 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r03_t004">
+      <static>true</static>
+      <pose>13.645115 -2.479199 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r03_t005">
+      <static>true</static>
+      <pose>17.629993 -2.826691 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r03_t006">
+      <static>true</static>
+      <pose>21.614870 -3.174183 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r03_t007">
+      <static>true</static>
+      <pose>25.599748 -3.521674 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r03_t008">
+      <static>true</static>
+      <pose>29.584625 -3.869166 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r03_t009">
+      <static>true</static>
+      <pose>33.569503 -4.216658 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r04_t000">
+      <static>true</static>
+      <pose>-1.583292 1.759775 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r04_t001">
+      <static>true</static>
+      <pose>2.401585 1.412283 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r04_t002">
+      <static>true</static>
+      <pose>6.386463 1.064791 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r04_t003">
+      <static>true</static>
+      <pose>10.371340 0.717299 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r04_t004">
+      <static>true</static>
+      <pose>14.356218 0.369808 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r04_t005">
+      <static>true</static>
+      <pose>18.341096 0.022316 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r04_t006">
+      <static>true</static>
+      <pose>22.325973 -0.325176 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r04_t007">
+      <static>true</static>
+      <pose>26.310851 -0.672668 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_r04_t008">
+      <static>true</static>
+      <pose>30.295728 -1.020160 0 0 0 0</pose>
+      <link name="link">
+        <collision name="trunk_collision">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="trunk_visual">
+          <pose>0 0 1.000000 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.150000</radius>
+              <length>2.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.25 0.18 0.12 1</ambient>
+            <diffuse>0.35 0.25 0.18 1</diffuse>
+          </material>
+        </visual>
+        <visual name="canopy_visual">
+          <pose>0 0 2.800000 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.800000</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.10 0.25 0.10 1</ambient>
+            <diffuse>0.15 0.35 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>

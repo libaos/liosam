@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- 加载PCD文件的参数 -->
+  <arg name="use_pcd_map" default="true"/>
+  <arg name="pcd_map_path" default="/root/shared_dir/LIO-SAM/shangpo2map0.01/GlobalMap.pcd"/>
+  
+  <!-- 坡度代价地图层参数 -->
+  <arg name="max_slope_angle" default="30.0"/>
+  <arg name="max_roughness" default="0.1"/>
+  <arg name="slope_threshold" default="25.0"/>
+  <arg name="roughness_threshold" default="0.05"/>
+  <arg name="slope_weight" default="0.7"/>
+  <arg name="roughness_weight" default="0.3"/>
+  <arg name="resolution" default="0.05"/>
+  <arg name="visualize" default="true"/>
+  
+  <!-- 发布静态TF变换 -->
+  <node pkg="tf" type="static_transform_publisher" name="map_to_base_link" 
+        args="0 0 0 0 0 0 map base_link 100" />
+  
+  <!-- 处理点云生成高度图和坡度图 -->
+  <node pkg="slope_costmap_layer" type="process_global_map" name="process_global_map" output="screen">
+    <param name="pcd_file_path" value="$(arg pcd_map_path)"/>
+    <param name="resolution" value="$(arg resolution)"/>
+  </node>
+  
+  <!-- 启动move_base节点 -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+    <param name="controller_frequency" value="5.0"/>
+    <param name="base_local_planner" value="psolqr_local_planner/PsoLqrPlanner" />
+    
+    <!-- 加载代价地图配置 -->
+    <rosparam file="$(find slope_costmap_layer)/config/global_costmap_with_slope.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find slope_costmap_layer)/config/local_costmap_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find slope_costmap_layer)/config/move_base_params.yaml" command="load" />
+    
+    <!-- 传递坡度层参数 -->
+    <param name="global_costmap/slope_layer/use_pcd_map" value="$(arg use_pcd_map)"/>
+    <param name="global_costmap/slope_layer/pcd_map_path" value="$(arg pcd_map_path)"/>
+    <param name="global_costmap/slope_layer/max_slope_angle" value="$(arg max_slope_angle)"/>
+    <param name="global_costmap/slope_layer/max_roughness" value="$(arg max_roughness)"/>
+    <param name="global_costmap/slope_layer/slope_threshold" value="$(arg slope_threshold)"/>
+    <param name="global_costmap/slope_layer/roughness_threshold" value="$(arg roughness_threshold)"/>
+    <param name="global_costmap/slope_layer/slope_weight" value="$(arg slope_weight)"/>
+    <param name="global_costmap/slope_layer/roughness_weight" value="$(arg roughness_weight)"/>
+    <param name="global_costmap/slope_layer/resolution" value="$(arg resolution)"/>
+    <param name="global_costmap/slope_layer/visualize" value="$(arg visualize)"/>
+  </node>
+  
+  <!-- 启动RViz -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find slope_costmap_layer)/rviz/slope_visualization.rviz"/>
+</launch> 

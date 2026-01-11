@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- 点云文件路径 -->
+  <arg name="pcd_file_path" default="/root/shared_dir/LIO-SAM/shangpo2map0.01/GlobalMap.pcd"/>
+  <arg name="resolution" default="0.1"/>
+  <arg name="normal_radius" default="0.5"/>
+  <arg name="ground_distance_threshold" default="0.2"/>
+  <arg name="visualize_normals" default="true"/>
+  
+  <!-- 发布静态TF变换 -->
+  <node pkg="tf" type="static_transform_publisher" name="map_to_base_link" 
+        args="0 0 0 0 0 0 map base_link 100" />
+  
+  <!-- 启动地面坡度可视化节点 -->
+  <node pkg="slope_costmap_layer" type="ground_slope_visualization" name="ground_slope_visualization" output="screen">
+    <param name="pcd_file_path" value="$(arg pcd_file_path)"/>
+    <param name="resolution" value="$(arg resolution)"/>
+    <param name="normal_radius" value="$(arg normal_radius)"/>
+    <param name="ground_distance_threshold" value="$(arg ground_distance_threshold)"/>
+    <param name="visualize_normals" value="$(arg visualize_normals)"/>
+  </node>
+  
+  <!-- 启动RViz -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find slope_costmap_layer)/rviz/ground_slope_visualization.rviz"/>
+</launch> 

@@ -1,0 +1,60 @@
+<launch>
+  <arg name="config" default="$(find orchard_row_mapping)/config/liorl_prior.yaml" />
+  <arg name="pcd_path" default="/mysda/w/w/lio_ws/maps/GlobalMap.pcd" />
+  <arg name="row_model_file" default="$(find orchard_row_mapping)/config/row_model_pca_major.json" />
+  <arg name="row_detection" default="gap" />
+  <arg name="hist_bin_size" default="0.1" />
+  <arg name="hist_smooth_window" default="9" />
+  <arg name="hist_peak_min_fraction" default="0.08" />
+  <arg name="row_center_min_separation" default="2.0" />
+  <arg name="row_direction_mode" default="auto" />
+  <arg name="row_direction_yaw_deg" default="0.0" />
+  <arg name="colorize_all_rows" default="false" />
+  <arg name="publish_nearest_rows" default="0" />
+  <arg name="publish_all_centerlines" default="false" />
+  <arg name="publish_nearest_centerlines" default="0" />
+  <arg name="publish_all_rows" default="false" />
+  <arg name="publish_centerline" default="true" />
+  <arg name="publish_row_boundaries" default="true" />
+  <arg name="publish_centerline_labels" default="false" />
+  <arg name="centerline_label_mode" default="absolute" />
+  <arg name="centerline_label_start_index" default="1" />
+  <arg name="centerline_label_height" default="0.6" />
+  <arg name="centerline_label_z_offset" default="0.6" />
+  <arg name="row_v_offsets" default="" />
+  <arg name="row_v_offset_direction" default="perp" />
+  <arg name="force_rebuild_model" default="false" />
+  <arg name="row_cluster_gap" default="0.8" />
+  <arg name="min_points_per_row" default="200" />
+  <arg name="line_length" default="20.0" />
+
+  <node pkg="orchard_row_mapping" type="orchard_row_prior_node.py" name="orchard_row_prior" output="screen">
+    <rosparam file="$(arg config)" command="load" />
+    <param name="pcd_path" value="$(arg pcd_path)" />
+    <param name="row_model_file" value="$(arg row_model_file)" />
+    <param name="row_detection" value="$(arg row_detection)" />
+    <param name="hist_bin_size" value="$(arg hist_bin_size)" />
+    <param name="hist_smooth_window" value="$(arg hist_smooth_window)" />
+    <param name="hist_peak_min_fraction" value="$(arg hist_peak_min_fraction)" />
+    <param name="row_center_min_separation" value="$(arg row_center_min_separation)" />
+    <param name="row_direction_mode" value="$(arg row_direction_mode)" />
+    <param name="row_direction_yaw_deg" value="$(arg row_direction_yaw_deg)" />
+    <param name="colorize_all_rows" value="$(arg colorize_all_rows)" />
+    <param name="publish_nearest_rows" value="$(arg publish_nearest_rows)" />
+    <param name="publish_all_centerlines" value="$(arg publish_all_centerlines)" />
+    <param name="publish_nearest_centerlines" value="$(arg publish_nearest_centerlines)" />
+    <param name="publish_all_rows" value="$(arg publish_all_rows)" />
+    <param name="publish_centerline" value="$(arg publish_centerline)" />
+    <param name="publish_row_boundaries" value="$(arg publish_row_boundaries)" />
+    <param name="publish_centerline_labels" value="$(arg publish_centerline_labels)" />
+    <param name="centerline_label_mode" value="$(arg centerline_label_mode)" />
+    <param name="centerline_label_start_index" value="$(arg centerline_label_start_index)" />
+    <param name="centerline_label_height" value="$(arg centerline_label_height)" />
+    <param name="centerline_label_z_offset" value="$(arg centerline_label_z_offset)" />
+    <param name="row_v_offsets" value="$(arg row_v_offsets)" />
+    <param name="row_v_offset_direction" value="$(arg row_v_offset_direction)" />
+    <param name="force_rebuild_model" value="$(arg force_rebuild_model)" />
+    <param name="min_points_per_row" value="$(arg min_points_per_row)" />
+    <param name="line_length" value="$(arg line_length)" />
+  </node>
+</launch>

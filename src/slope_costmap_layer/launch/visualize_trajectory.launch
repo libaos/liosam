@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Use absolute path to CSV file -->
+  <arg name="csv_file" default="$(env HOME)/lio_ws/trajectory_data/2025-07-09-15-57-19__liorl_mapping_path.csv"/>
+  <arg name="frame_id" default="map"/>
+  <arg name="publish_rate" default="1.0"/> <!-- Hz -->
+  
+  <!-- Launch static transform publisher to provide a reference frame -->
+  <node pkg="tf" type="static_transform_publisher" name="map_to_base_link" 
+        args="0 0 0 0 0 0 map base_link 100" />
+  
+  <!-- Launch trajectory visualization node -->
+  <node name="trajectory_visualizer" pkg="slope_costmap_layer" type="visualize_trajectory_rviz.py" output="screen">
+    <param name="csv_file" value="$(arg csv_file)"/>
+    <param name="frame_id" value="$(arg frame_id)"/>
+    <param name="rate" value="$(arg publish_rate)"/>
+  </node>
+  
+  <!-- Launch RViz with trajectory visualization config -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(env HOME)/lio_ws/src/slope_costmap_layer/rviz/trajectory_visualization.rviz"/>
+</launch> 

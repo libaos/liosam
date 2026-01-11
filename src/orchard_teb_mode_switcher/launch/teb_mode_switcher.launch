@@ -1,0 +1,29 @@
+<launch>
+  <arg name="mode_topic" default="/fsm/mode" />
+  <arg name="teb_server" default="/move_base/TebLocalPlannerROS" />
+  <arg name="default_profile" default="straight" />
+  <arg name="apply_on_start" default="true" />
+  <arg name="min_update_period_s" default="0.2" />
+
+  <node pkg="orchard_teb_mode_switcher" type="teb_mode_switcher_node.py" name="teb_mode_switcher" output="screen">
+    <param name="mode_topic" value="$(arg mode_topic)" />
+    <param name="teb_server" value="$(arg teb_server)" />
+    <param name="default_profile" value="$(arg default_profile)" />
+    <param name="apply_on_start" value="$(arg apply_on_start)" />
+    <param name="min_update_period_s" value="$(arg min_update_period_s)" />
+
+    <rosparam param="profiles">
+      straight:
+        max_vel_x: 0.55
+        max_vel_theta: 0.25
+        acc_lim_x: 0.35
+        acc_lim_theta: 0.45
+      turn:
+        max_vel_x: 0.30
+        max_vel_theta: 0.55
+        acc_lim_x: 0.25
+        acc_lim_theta: 0.80
+    </rosparam>
+  </node>
+</launch>
+

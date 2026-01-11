@@ -1,0 +1,98 @@
+# Catkin/ROS build artifacts
+/build/
+/devel/
+/install/
+/.catkin_tools/
+/.catkin_workspace
+/.ros/
+/.ros_*/
+/.ros*/
+
+# CMake build artifacts (if generated in workspace root)
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/Makefile
+
+# Logs and runtime artifacts
+*.log
+*.bag
+*.bag.active
+*.db3
+
+# Point cloud / map outputs
+*.pcd
+*.ply
+*.vtk
+/maps/
+*.bak
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# IDE/editor
+.vscode/
+.idea/
+*~
+
+# Local venvs / Codex artifacts
+/.venv_orchard/
+/.codex_runtime_test_*/
+/.codex/
+/.codex-switch/
+/.cache/
+/.cursor/
+/.mpl/
+/.conda/
+/.mamba/
+/.miniforge3/
+/.miniforge3_base/
+
+# Local installers
+/Miniforge3-*.sh
+
+# Simulator caches
+/.gazebo/
+/.ignition/
+
+# Extra build/test workspaces
+/build_teb_tests/
+/devel_teb_tests/
+/dist/
+
+# Local outputs in repo root
+/map*.bin
+/trace_nvidia_smi.txt
+
+# Local backups created during repo cleanup
+.git_backup_*
+
+# Data folders (usually large, generated)
+/rosbags/
+/trajectory_data/
+/teb_trajectory_data/
+
+# Large third-party / local copies (keep sources elsewhere if needed)
+/gtsam-4.0.3/
+/small_gicp/
+/+autoware_vision_dartknet
+
+# Misc workspace folders/files to omit
+/.spec-workflow/
+/lio_ws/
+/psolqr_local_planner/
+/slope_distribution.csv
+/visualize_all_trajectories.py
+/visualize_multiple_trajectories.py
+/visualize_trajectory.launch
+
+# Personal notes / misc in this workspace
+/学习/
+/需求/
+/命令
+/安装
+/github命令
+/论文/
+/规划文档.md

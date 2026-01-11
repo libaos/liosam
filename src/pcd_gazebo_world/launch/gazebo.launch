@@ -1,0 +1,23 @@
+<launch>
+  <arg name="world_name" default="$(find pcd_gazebo_world)/worlds/pcd_world.world"/>
+  <arg name="paused" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="gazebo_master_uri" default="$(optenv GAZEBO_MASTER_URI http://localhost:11345)"/>
+  <arg name="gazebo_ip" default="$(optenv GAZEBO_IP 127.0.0.1)"/>
+  
+  <!-- 设置 Gazebo 模型路径 -->
+  <env name="GAZEBO_MODEL_PATH" 
+       value="$(find pcd_gazebo_world)/models:/usr/share/gazebo-11/models:$(optenv GAZEBO_MODEL_PATH)"/>
+  <!-- 禁用在线模型库（避免联网拉取） -->
+  <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
+  <env name="GAZEBO_MASTER_URI" value="$(arg gazebo_master_uri)"/>
+  <env name="GAZEBO_IP" value="$(arg gazebo_ip)"/>
+  
+  <!-- 启动 Gazebo -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(arg world_name)"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="use_sim_time" value="true"/>
+  </include>
+</launch>

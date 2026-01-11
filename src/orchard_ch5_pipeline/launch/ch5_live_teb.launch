@@ -1,0 +1,92 @@
+<launch>
+  <param name="/use_sim_time" value="false" />
+
+  <arg name="enable_move_base" default="true" />
+  <arg name="enable_route_replay" default="false" />
+  <arg name="enable_orchard_segmentation" default="true" />
+  <arg name="enable_tree_clustering" default="true" />
+  <arg name="enable_scancontext" default="true" />
+  <arg name="enable_teb_switcher" default="true" />
+
+  <arg name="orchard_config" default="$(find orchard_row_mapping)/config/liorl_pretty.yaml" />
+  <arg name="cloud_topic" default="/liorl/deskew/cloud_deskewed" />
+  <arg name="mode_topic" default="/fsm/mode" />
+
+  <arg name="tree_cluster_input" default="/orchard_segmentation/tree_cloud" />
+  <arg name="tree_cluster_process_hz" default="2.0" />
+  <arg name="tree_cluster_z_min" default="0.7" />
+  <arg name="tree_cluster_z_max" default="1.3" />
+  <arg name="tree_cluster_cell_size" default="0.10" />
+  <arg name="tree_cluster_min_points" default="40" />
+
+  <arg name="teb_server" default="/move_base_benchmark/TebLocalPlannerROS" />
+
+  <arg name="map_filename" default="$(find move_base_benchmark)/maps/empty_world/map.yaml" />
+  <arg name="global_frame" default="map" />
+  <arg name="local_frame" default="odom_est" />
+  <arg name="base_frame" default="base_link_est" />
+  <arg name="odom_topic" default="liorl/mapping/odometry_incremental" />
+  <arg name="costmap_common_params" default="$(find move_base_benchmark)/params/orchard_costmap_common_params.yaml" />
+  <arg name="global_costmap_params" default="$(find move_base_benchmark)/params/global_costmap_params.yaml" />
+  <arg name="local_costmap_params" default="$(find move_base_benchmark)/params/orchard_local_costmap_params.yaml" />
+  <arg name="local_planner_params" default="$(find move_base_benchmark)/params/orchard_teb_local_planner_params.yaml" />
+  <arg name="local_planner_override_params" default="" />
+  <arg name="enable_tree_cloud_costmap" default="true" />
+  <arg name="tree_cloud_costmap_params" default="$(find orchard_ch5_pipeline)/config/local_costmap_tree_cloud.yaml" />
+
+  <arg name="route_bag" default="" />
+  <arg name="route_topic" default="" />
+  <arg name="route_min_dist" default="1.0" />
+  <arg name="route_start_nearest" default="true" />
+  <arg name="route_goal_timeout" default="60.0" />
+  <arg name="route_skip_failed" default="true" />
+
+  <include if="$(arg enable_orchard_segmentation)" file="$(find orchard_row_mapping)/launch/orchard_row_liorl_pretty.launch">
+    <arg name="config" value="$(arg orchard_config)" />
+  </include>
+
+  <node if="$(arg enable_tree_clustering)" pkg="orchard_row_mapping" type="orchard_tree_clusters_node.py"
+        name="orchard_tree_clusters" output="screen">
+    <param name="input_topic" value="$(arg tree_cluster_input)" />
+    <param name="process_hz" value="$(arg tree_cluster_process_hz)" />
+    <param name="z_min" value="$(arg tree_cluster_z_min)" />
+    <param name="z_max" value="$(arg tree_cluster_z_max)" />
+    <param name="cluster_cell_size" value="$(arg tree_cluster_cell_size)" />
+    <param name="min_points_per_tree" value="$(arg tree_cluster_min_points)" />
+  </node>
+
+  <include if="$(arg enable_scancontext)" file="$(find orchard_scancontext_fsm)/launch/scancontext_fsm.launch">
+    <arg name="cloud_topic" value="$(arg cloud_topic)" />
+    <arg name="mode_topic" value="$(arg mode_topic)" />
+  </include>
+
+  <include if="$(arg enable_teb_switcher)" file="$(find orchard_teb_mode_switcher)/launch/teb_mode_switcher.launch">
+    <arg name="mode_topic" value="$(arg mode_topic)" />
+    <arg name="teb_server" value="$(arg teb_server)" />
+  </include>
+
+  <include if="$(arg enable_move_base)" file="$(find orchard_ch5_pipeline)/launch/move_base_orchard_teb.launch">
+    <arg name="map_filename" value="$(arg map_filename)" />
+    <arg name="global_frame" value="$(arg global_frame)" />
+    <arg name="local_frame" value="$(arg local_frame)" />
+    <arg name="base_frame" value="$(arg base_frame)" />
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="costmap_common_params" value="$(arg costmap_common_params)" />
+    <arg name="global_costmap_params" value="$(arg global_costmap_params)" />
+    <arg name="local_costmap_params" value="$(arg local_costmap_params)" />
+    <arg name="local_planner_params" value="$(arg local_planner_params)" />
+    <arg name="local_planner_override_params" value="$(arg local_planner_override_params)" />
+    <arg name="enable_tree_cloud_costmap" value="$(arg enable_tree_cloud_costmap)" />
+    <arg name="tree_cloud_params" value="$(arg tree_cloud_costmap_params)" />
+  </include>
+
+  <include if="$(arg enable_route_replay)" file="$(find bag_route_replay)/launch/replay_from_bag.launch">
+    <arg name="bag_path" value="$(arg route_bag)" />
+    <arg name="path_topic" value="$(arg route_topic)" />
+    <arg name="min_dist" value="$(arg route_min_dist)" />
+    <arg name="start_nearest" value="$(arg route_start_nearest)" />
+    <arg name="goal_timeout" value="$(arg route_goal_timeout)" />
+    <arg name="skip_failed" value="$(arg route_skip_failed)" />
+  </include>
+</launch>
+

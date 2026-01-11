@@ -1,0 +1,43 @@
+<launch>
+  <arg name="bag" default="" />
+  <arg name="rate" default="1" />
+  <arg name="bag_args" default="" />
+  <arg name="topics" default="/liorl/deskew/cloud_deskewed /tf /liorl/mapping/path" />
+  <arg name="cloud_topic" default="/liorl/deskew/cloud_deskewed" />
+
+  <arg name="enable_orchard_segmentation" default="true" />
+  <arg name="orchard_config" default="$(find orchard_row_mapping)/config/liorl_pretty.yaml" />
+
+  <arg name="enable_tree_clustering" default="true" />
+  <arg name="tree_cluster_input" default="/orchard_segmentation/tree_cloud" />
+  <arg name="tree_cluster_process_hz" default="2.0" />
+  <arg name="tree_cluster_z_min" default="0.7" />
+  <arg name="tree_cluster_z_max" default="1.3" />
+  <arg name="tree_cluster_cell_size" default="0.10" />
+  <arg name="tree_cluster_min_points" default="40" />
+
+  <arg name="record" default="false" />
+  <arg name="out_bag" default="" />
+  <arg name="record_topics" default="/fsm/mode /liorl/mapping/path" />
+
+  <include file="$(find orchard_scancontext_fsm)/launch/ch5_from_bag.launch">
+    <arg name="bag" value="$(arg bag)" />
+    <arg name="rate" value="$(arg rate)" />
+    <arg name="bag_args" value="$(arg bag_args)" />
+    <arg name="topics" value="$(arg topics)" />
+    <arg name="cloud_topic" value="$(arg cloud_topic)" />
+    <arg name="enable_orchard_segmentation" value="$(arg enable_orchard_segmentation)" />
+    <arg name="orchard_config" value="$(arg orchard_config)" />
+    <arg name="enable_tree_clustering" value="$(arg enable_tree_clustering)" />
+    <arg name="tree_cluster_input" value="$(arg tree_cluster_input)" />
+    <arg name="tree_cluster_process_hz" value="$(arg tree_cluster_process_hz)" />
+    <arg name="tree_cluster_z_min" value="$(arg tree_cluster_z_min)" />
+    <arg name="tree_cluster_z_max" value="$(arg tree_cluster_z_max)" />
+    <arg name="tree_cluster_cell_size" value="$(arg tree_cluster_cell_size)" />
+    <arg name="tree_cluster_min_points" value="$(arg tree_cluster_min_points)" />
+    <arg name="record" value="$(arg record)" />
+    <arg name="out_bag" value="$(arg out_bag)" />
+    <arg name="record_topics" value="$(arg record_topics)" />
+  </include>
+</launch>
+

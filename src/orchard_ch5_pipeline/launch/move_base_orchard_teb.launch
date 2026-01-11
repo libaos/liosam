@@ -1,0 +1,52 @@
+<launch>
+  <param name="/use_sim_time" value="false" />
+
+  <arg name="move_base_node" default="move_base_benchmark" />
+  <arg name="log_filename" default="$(find move_base_benchmark)/launch/log.txt" />
+  <arg name="map_filename" default="$(find move_base_benchmark)/maps/empty_world/map.yaml" />
+  <arg name="global_frame" default="map" />
+  <arg name="local_frame" default="odom_est" />
+  <arg name="base_frame" default="base_link_est" />
+
+  <arg name="odom_topic" default="liorl/mapping/odometry_incremental" />
+
+  <arg name="costmap_common_params" default="$(find move_base_benchmark)/params/orchard_costmap_common_params.yaml" />
+  <arg name="global_costmap_params" default="$(find move_base_benchmark)/params/global_costmap_params.yaml" />
+  <arg name="local_costmap_params" default="$(find move_base_benchmark)/params/orchard_local_costmap_params.yaml" />
+  <arg name="local_planner_params" default="$(find move_base_benchmark)/params/orchard_teb_local_planner_params.yaml" />
+  <arg name="local_planner_override_params" default="" />
+
+  <arg name="enable_tree_cloud_costmap" default="true" />
+  <arg name="tree_cloud_params" default="$(find orchard_ch5_pipeline)/config/local_costmap_tree_cloud.yaml" />
+
+  <node pkg="move_base_benchmark" type="move_base_benchmark" respawn="false" name="$(arg move_base_node)" output="screen">
+    <rosparam file="$(arg costmap_common_params)" command="load" ns="global_costmap" />
+    <rosparam file="$(arg costmap_common_params)" command="load" ns="local_costmap" />
+    <rosparam file="$(arg global_costmap_params)" command="load" />
+    <rosparam file="$(arg local_costmap_params)" command="load" />
+    <rosparam if="$(arg enable_tree_cloud_costmap)" file="$(arg tree_cloud_params)" command="load" ns="local_costmap" />
+
+    <param name="global_costmap/global_frame" value="$(arg global_frame)" />
+    <param name="local_costmap/global_frame" value="$(arg local_frame)" />
+    <param name="global_costmap/robot_base_frame" value="$(arg base_frame)" />
+    <param name="local_costmap/robot_base_frame" value="$(arg base_frame)" />
+
+    <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+    <param name="planner_frequency" value="10.0" />
+    <param name="planner_patience" value="5.0" />
+
+    <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+    <rosparam file="$(arg local_planner_params)" command="load" />
+    <rosparam if="$(eval arg('local_planner_override_params') != '')" file="$(arg local_planner_override_params)" command="load" />
+    <param name="controller_frequency" value="10.0" />
+    <param name="controller_patience" value="15.0" />
+
+    <param name="log_filename" value="$(arg log_filename)" />
+    <remap from="odom" to="$(arg odom_topic)" />
+  </node>
+
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_filename)" output="screen">
+    <param name="frame_id" value="$(arg global_frame)" />
+  </node>
+</launch>
+

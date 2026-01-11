@@ -1,0 +1,110 @@
+<launch>
+  <!-- One-command bag replay + tracker (for validation). -->
+
+  <!-- Bag -->
+  <arg name="bag" default="/mysda/w/w/lio_ws/rosbags/tree_cloud_full_fast_20251228_172644.bag" />
+  <!-- Delay a bit so the tracker node can initialize/sub before playback starts. -->
+  <arg name="bag_args" default="--clock --delay 1.0" />
+
+  <!-- Tracker args (defaults match this repo's example bag) -->
+  <arg name="input_topic" default="/orchard_segmentation/tree_cloud" />
+  <arg name="label_field" default="label" />
+  <arg name="markers_topic" default="/tree_markers" />
+  <arg name="json_topic" default="/tree_detections_json" />
+  <arg name="row_fit_json_topic" default="/tree_row_fit_json" />
+  <arg name="csv_path" default="/tmp/tree_detections.csv" />
+  <arg name="csv_flush_interval" default="1.0" />
+  <arg name="log_summary_interval" default="1.0" />
+  <arg name="publish_missed" default="false" />
+
+  <!-- Paper-reproducible BEV export (disabled by default) -->
+  <arg name="export_dir" default="" />
+  <arg name="export_every_n" default="0" />
+  <arg name="export_max_frames" default="0" />
+  <arg name="bev_res" default="0.0" />
+  <arg name="bev_width_px" default="0" />
+  <arg name="bev_height_px" default="0" />
+  <arg name="export_draw_ids" default="true" />
+  <arg name="export_draw_crowns" default="true" />
+
+  <!-- Row fit -->
+  <arg name="row_fit_min_points" default="3" />
+  <arg name="row_fit_inlier_dist" default="0.20" />
+  <arg name="row_fit_iters" default="2" />
+  <!-- History-based row fit (uses last N frames of detections; deterministic) -->
+  <arg name="row_fit_history_frames" default="20" />
+  <!-- Filter for row fit only (does not change ~json_out/CSV); 0 disables filtering -->
+  <arg name="row_fit_min_conf" default="0.0" />
+  <!-- Optional: motion-compensated row fit via TF (e.g. map/odom_est). Empty disables. -->
+  <arg name="row_fit_fixed_frame" default="" />
+  <arg name="row_fit_fixed_frame_timeout" default="0.05" />
+
+  <!-- Also allow overriding ROI etc via args, reusing the base launch. -->
+  <arg name="roi_x_min" default="0.0" />
+  <arg name="roi_x_max" default="10.0" />
+  <arg name="roi_y_min" default="-4.0" />
+  <arg name="roi_y_max" default="4.0" />
+  <arg name="roi_z_min" default="-0.5" />
+  <arg name="roi_z_max" default="2.5" />
+
+  <arg name="voxel_size" default="0.03" />
+  <arg name="cell_size" default="0.10" />
+  <arg name="grid_T" default="5" />
+  <arg name="gate_distance" default="0.30" />
+  <arg name="max_missed" default="10" />
+  <arg name="K" default="20" />
+  <arg name="ema_alpha" default="0.4" />
+
+  <!-- Use /clock from bag -->
+  <param name="/use_sim_time" value="true" />
+
+  <!-- Play bag inside roslaunch (no extra terminal needed). -->
+  <node pkg="rosbag" type="play" name="bag_play" output="screen" required="true"
+        args="$(arg bag_args) $(arg bag)" />
+
+  <include file="$(find orchard_tree_tracker)/launch/fruit_tree_tracker.launch">
+    <arg name="input_topic" value="$(arg input_topic)" />
+    <arg name="label_field" value="$(arg label_field)" />
+    <arg name="markers_topic" value="$(arg markers_topic)" />
+    <arg name="json_topic" value="$(arg json_topic)" />
+    <arg name="row_fit_json_topic" value="$(arg row_fit_json_topic)" />
+    <arg name="csv_path" value="$(arg csv_path)" />
+    <arg name="csv_flush_interval" value="$(arg csv_flush_interval)" />
+    <arg name="log_summary_interval" value="$(arg log_summary_interval)" />
+    <arg name="publish_missed" value="$(arg publish_missed)" />
+
+    <arg name="export_dir" value="$(arg export_dir)" />
+    <arg name="export_every_n" value="$(arg export_every_n)" />
+    <arg name="export_max_frames" value="$(arg export_max_frames)" />
+    <arg name="bev_res" value="$(arg bev_res)" />
+    <arg name="bev_width_px" value="$(arg bev_width_px)" />
+    <arg name="bev_height_px" value="$(arg bev_height_px)" />
+    <arg name="export_draw_ids" value="$(arg export_draw_ids)" />
+    <arg name="export_draw_crowns" value="$(arg export_draw_crowns)" />
+
+    <arg name="row_fit_min_points" value="$(arg row_fit_min_points)" />
+    <arg name="row_fit_inlier_dist" value="$(arg row_fit_inlier_dist)" />
+    <arg name="row_fit_iters" value="$(arg row_fit_iters)" />
+    <arg name="row_fit_history_frames" value="$(arg row_fit_history_frames)" />
+    <arg name="row_fit_min_conf" value="$(arg row_fit_min_conf)" />
+    <arg name="row_fit_fixed_frame" value="$(arg row_fit_fixed_frame)" />
+    <arg name="row_fit_fixed_frame_timeout" value="$(arg row_fit_fixed_frame_timeout)" />
+
+    <arg name="roi_x_min" value="$(arg roi_x_min)" />
+    <arg name="roi_x_max" value="$(arg roi_x_max)" />
+    <arg name="roi_y_min" value="$(arg roi_y_min)" />
+    <arg name="roi_y_max" value="$(arg roi_y_max)" />
+    <arg name="roi_z_min" value="$(arg roi_z_min)" />
+    <arg name="roi_z_max" value="$(arg roi_z_max)" />
+
+    <arg name="voxel_size" value="$(arg voxel_size)" />
+    <arg name="cell_size" value="$(arg cell_size)" />
+    <arg name="grid_T" value="$(arg grid_T)" />
+
+    <arg name="gate_distance" value="$(arg gate_distance)" />
+    <arg name="max_missed" value="$(arg max_missed)" />
+
+    <arg name="K" value="$(arg K)" />
+    <arg name="ema_alpha" value="$(arg ema_alpha)" />
+  </include>
+</launch>

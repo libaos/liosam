@@ -1,0 +1,12 @@
+pointcloud_topic: "/velodyne_points"
+model_path: "/mysda/w/w/RandLA-Net-pytorch/noslam/checkpoints/best_model.pth"
+num_points: 16384
+num_classes: 2
+tree_class: 0
+min_points_per_row: 200
+split_axis: "y"
+row_width: 0.15
+row_alpha: 1.0
+label_colors:
+  "0": [56, 188, 75]
+  "1": [180, 180, 180]

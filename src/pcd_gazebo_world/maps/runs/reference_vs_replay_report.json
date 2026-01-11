@@ -1,0 +1,18 @@
+{
+  "reference": "/mysda/w/w/lio_ws/src/pcd_gazebo_world/maps/runs/rosbag_path.json",
+  "replay": "/mysda/w/w/lio_ws/trajectory_data/teb_odom.csv",
+  "reference_points": 102,
+  "replay_points": 6562,
+  "reference_length_m": 95.23490040793395,
+  "replay_length_m": 19.819359407755147,
+  "reference_closure_m": 0.6020220148943483,
+  "replay_closure_m": 15.842918503759238,
+  "replay_to_reference": {
+    "mean_m": 2.5637566450615066,
+    "median_m": 2.904755523942823,
+    "p95_m": 3.0821309379525164,
+    "max_m": 3.6755181281362135
+  },
+  "coverage_ratio": 0.7817738155445324,
+  "title": "Reference vs replay | ref_close=0.60m replay_close=15.84m mean=2.56m p95=3.08m max=3.68m cover=78.2% | 2025-10-29-16-05-00.bag /liorl/mapping/path"
+}

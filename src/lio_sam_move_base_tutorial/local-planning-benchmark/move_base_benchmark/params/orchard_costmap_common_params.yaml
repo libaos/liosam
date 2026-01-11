@@ -1,0 +1,34 @@
+---
+# Orchard-friendly costmap tuning (copy of costmap_common_params.yaml with safer defaults for narrow rows).
+# IMPORTANT: You must set the footprint/robot_radius to match your real robot, otherwise it will stop too early.
+
+# Use either robot_radius+padding OR footprint (footprint has higher priority if both exist).
+# robot_radius: 0.30
+# footprint_padding: 0.01
+footprint: [[0.65, 0.425], [0.65, -0.425], [-0.65, -0.425], [-0.65, 0.425]]
+
+transform_tolerance: 0.2
+always_send_full_costmap: true
+
+obstacle_layer:
+  enabled: true
+  obstacle_range: 3.0
+  raytrace_range: 5.0
+  track_unknown_space: true
+  combination_method: 1
+
+  observation_sources: laser_scan_sensor
+  laser_scan_sensor:
+    { data_type: LaserScan, topic: /scan, marking: true, clearing: true, inf_is_valid: true }
+
+inflation_layer:
+  enabled: true
+  # Larger => cost drops faster with distance (lets the robot pass closer without marking a wide "red" band)
+  cost_scaling_factor: 15.0
+  # Smaller => allows narrower passages (too small is unsafe)
+  inflation_radius: 0.30
+
+static_layer:
+  enabled: true
+  map_topic: "/map"
+

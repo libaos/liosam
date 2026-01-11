@@ -1,0 +1,17 @@
+<launch>
+  <arg name="config" default="$(find orchard_row_mapping)/config/liorl_tree_map.yaml" />
+  <arg name="output_pcd" default="/mysda/w/w/lio_ws/maps/TreeMap_auto.pcd" />
+  <arg name="voxel_size" default="0.10" />
+
+  <node pkg="orchard_row_mapping" type="orchard_segmentation_node.py" name="orchard_segmentation" output="screen">
+    <env name="PYTHONPATH" value="/mysda/w/w/lio_ws/.venv_orchard/lib/python3.8/site-packages:$(optenv PYTHONPATH)" />
+    <rosparam file="$(arg config)" command="load" />
+  </node>
+
+  <node pkg="orchard_row_mapping" type="orchard_tree_map_builder_node.py" name="orchard_tree_map_builder" output="screen">
+    <param name="input_topic" value="/orchard_segmentation/tree_cloud" />
+    <param name="map_frame" value="map" />
+    <param name="output_pcd" value="$(arg output_pcd)" />
+    <param name="voxel_size" value="$(arg voxel_size)" />
+  </node>
+</launch>

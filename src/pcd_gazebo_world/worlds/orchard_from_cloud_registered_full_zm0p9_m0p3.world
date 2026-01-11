@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="orchard_world">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Trees: 19 includes of model://tree_trunk -->
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0000</name>
+      <pose>-7.889916 -6.956344 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0001</name>
+      <pose>-7.144054 -6.714459 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0002</name>
+      <pose>-6.269038 -5.888447 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0003</name>
+      <pose>16.004457 -5.438119 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0004</name>
+      <pose>-7.320961 -5.077003 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0005</name>
+      <pose>-6.409283 -4.557876 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0006</name>
+      <pose>-7.539594 -4.370453 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0007</name>
+      <pose>-5.574506 -4.061331 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0008</name>
+      <pose>-4.912096 -3.715466 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0009</name>
+      <pose>4.214373 -2.667020 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0010</name>
+      <pose>23.703199 -2.048994 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0011</name>
+      <pose>35.509544 -1.969451 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0012</name>
+      <pose>33.220375 -1.514962 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0013</name>
+      <pose>-8.217902 -1.484294 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0014</name>
+      <pose>31.343132 -1.111986 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0015</name>
+      <pose>20.541403 -0.935777 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0016</name>
+      <pose>22.994465 -0.278452 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0017</name>
+      <pose>-0.997346 0.417450 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://tree_trunk</uri>
+      <name>tree_0018</name>
+      <pose>2.511365 3.711839 0 0 0 0</pose>
+    </include>
+  </world>
+</sdf>

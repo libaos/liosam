@@ -1,0 +1,102 @@
+<launch>
+  <!-- Topics -->
+  <arg name="input_topic" default="/segmented_points" />
+  <arg name="label_field" default="label" />
+  <arg name="markers_topic" default="/tree_markers" />
+  <arg name="json_topic" default="/tree_detections_json" />
+  <arg name="row_fit_json_topic" default="/tree_row_fit_json" />
+  <arg name="csv_path" default="" />
+  <arg name="csv_flush_interval" default="1.0" />
+  <arg name="log_summary_interval" default="1.0" />
+  <!-- If true, publish tracks even when missed (point_count=0). Default false publishes only seen trees. -->
+  <arg name="publish_missed" default="false" />
+
+  <!-- Paper-reproducible BEV export (disabled by default) -->
+  <arg name="export_dir" default="" />
+  <arg name="export_every_n" default="0" />
+  <arg name="export_max_frames" default="0" />
+  <arg name="bev_res" default="0.0" />
+  <arg name="bev_width_px" default="0" />
+  <arg name="bev_height_px" default="0" />
+  <arg name="export_draw_ids" default="true" />
+  <arg name="export_draw_crowns" default="true" />
+
+  <!-- Row fit -->
+  <arg name="row_fit_min_points" default="3" />
+  <arg name="row_fit_inlier_dist" default="0.20" />
+  <arg name="row_fit_iters" default="2" />
+  <!-- History-based row fit (uses last N frames of detections; deterministic) -->
+  <arg name="row_fit_history_frames" default="20" />
+  <!-- Filter for row fit only (does not change ~json_out/CSV); 0 disables filtering -->
+  <arg name="row_fit_min_conf" default="0.0" />
+  <!-- Optional: motion-compensated row fit via TF (e.g. map/odom_est). Empty disables. -->
+  <arg name="row_fit_fixed_frame" default="" />
+  <arg name="row_fit_fixed_frame_timeout" default="0.05" />
+
+  <!-- ROI -->
+  <arg name="roi_x_min" default="0.0" />
+  <arg name="roi_x_max" default="10.0" />
+  <arg name="roi_y_min" default="-4.0" />
+  <arg name="roi_y_max" default="4.0" />
+  <arg name="roi_z_min" default="-0.5" />
+  <arg name="roi_z_max" default="2.5" />
+
+  <!-- Preprocess / Instancing -->
+  <arg name="voxel_size" default="0.03" />
+  <arg name="cell_size" default="0.10" />
+  <arg name="grid_T" default="5" />
+
+  <!-- MOT -->
+  <arg name="gate_distance" default="0.30" />
+  <arg name="max_missed" default="10" />
+
+  <!-- Fit -->
+  <arg name="K" default="20" />
+  <arg name="ema_alpha" default="0.4" />
+
+  <node pkg="orchard_tree_tracker" type="fruit_tree_tracker_node.py" name="fruit_tree_tracker" output="screen">
+    <param name="input_topic" value="$(arg input_topic)" />
+    <param name="label_field" value="$(arg label_field)" />
+    <param name="markers" value="$(arg markers_topic)" />
+    <param name="json_out" value="$(arg json_topic)" />
+    <param name="row_fit_json" value="$(arg row_fit_json_topic)" />
+    <param name="csv_path" value="$(arg csv_path)" />
+    <param name="csv_flush_interval" value="$(arg csv_flush_interval)" />
+    <param name="log_summary_interval" value="$(arg log_summary_interval)" />
+    <param name="publish_missed" value="$(arg publish_missed)" />
+
+    <param name="export_dir" value="$(arg export_dir)" />
+    <param name="export_every_n" value="$(arg export_every_n)" />
+    <param name="export_max_frames" value="$(arg export_max_frames)" />
+    <param name="bev_res" value="$(arg bev_res)" />
+    <param name="bev_width_px" value="$(arg bev_width_px)" />
+    <param name="bev_height_px" value="$(arg bev_height_px)" />
+    <param name="export_draw_ids" value="$(arg export_draw_ids)" />
+    <param name="export_draw_crowns" value="$(arg export_draw_crowns)" />
+
+    <param name="row_fit_min_points" value="$(arg row_fit_min_points)" />
+    <param name="row_fit_inlier_dist" value="$(arg row_fit_inlier_dist)" />
+    <param name="row_fit_iters" value="$(arg row_fit_iters)" />
+    <param name="row_fit_history_frames" value="$(arg row_fit_history_frames)" />
+    <param name="row_fit_min_conf" value="$(arg row_fit_min_conf)" />
+    <param name="row_fit_fixed_frame" value="$(arg row_fit_fixed_frame)" />
+    <param name="row_fit_fixed_frame_timeout" value="$(arg row_fit_fixed_frame_timeout)" />
+
+    <param name="roi_x_min" value="$(arg roi_x_min)" />
+    <param name="roi_x_max" value="$(arg roi_x_max)" />
+    <param name="roi_y_min" value="$(arg roi_y_min)" />
+    <param name="roi_y_max" value="$(arg roi_y_max)" />
+    <param name="roi_z_min" value="$(arg roi_z_min)" />
+    <param name="roi_z_max" value="$(arg roi_z_max)" />
+
+    <param name="voxel_size" value="$(arg voxel_size)" />
+    <param name="cell_size" value="$(arg cell_size)" />
+    <param name="grid_T" value="$(arg grid_T)" />
+
+    <param name="gate_distance" value="$(arg gate_distance)" />
+    <param name="max_missed" value="$(arg max_missed)" />
+
+    <param name="K" value="$(arg K)" />
+    <param name="ema_alpha" value="$(arg ema_alpha)" />
+  </node>
+</launch>

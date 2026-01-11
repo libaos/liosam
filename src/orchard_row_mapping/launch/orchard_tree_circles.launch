@@ -1,0 +1,103 @@
+<launch>
+  <arg name="map_frame" default="map" />
+  <arg name="pcd_path" default="" />
+  <arg name="input_topic" default="/orchard_tree_map_builder/tree_map" />
+
+  <arg name="detection_mode" default="row_model_peaks" />
+  <arg name="row_model_file" default="$(find orchard_row_mapping)/config/row_model_pca_major.json" />
+  <arg name="row_bandwidth" default="0.8" />
+  <arg name="tree_u_bin_size" default="0.2" />
+  <arg name="tree_smooth_window" default="9" />
+  <arg name="tree_peak_min_fraction" default="0.12" />
+  <arg name="tree_min_separation" default="2.0" />
+  <arg name="tree_u_padding" default="0.0" />
+  <arg name="refine_u_half_width" default="0.8" />
+  <arg name="max_trees_per_row" default="0" />
+
+  <arg name="z_min" default="0.2" />
+  <arg name="z_max" default="2.0" />
+  <arg name="x_min" default="-1e9" />
+  <arg name="x_max" default="1e9" />
+  <arg name="y_abs_max" default="1e9" />
+  <arg name="max_points" default="80000" />
+  <arg name="sample_seed" default="0" />
+
+  <arg name="cluster_cell_size" default="0.30" />
+  <arg name="cluster_neighbor_range" default="1" />
+  <arg name="min_points_per_tree" default="80" />
+  <arg name="max_trees" default="0" />
+
+  <arg name="radius_mode" default="constant" />
+  <arg name="radius_constant" default="0.35" />
+  <arg name="radius_quantile" default="0.8" />
+  <arg name="radius_min" default="0.15" />
+  <arg name="radius_max" default="1.5" />
+
+  <arg name="marker_type" default="line_strip" />
+  <arg name="circle_segments" default="36" />
+  <arg name="line_width" default="0.12" />
+  <arg name="alpha" default="1.0" />
+  <arg name="marker_z" default="0.0" />
+  <arg name="color" default="[1.0, 1.0, 0.0]" />
+
+  <arg name="publish_labels" default="true" />
+  <arg name="label_height" default="0.6" />
+  <arg name="label_z_offset" default="0.8" />
+  <arg name="label_start_index" default="1" />
+
+  <arg name="publish_clusters_cloud" default="true" />
+
+  <arg name="export_csv" default="" />
+
+  <node pkg="orchard_row_mapping" type="orchard_tree_circles_node.py" name="orchard_tree_circles" output="screen">
+    <param name="map_frame" value="$(arg map_frame)" />
+    <param name="pcd_path" value="$(arg pcd_path)" />
+    <param name="input_topic" value="$(arg input_topic)" />
+
+    <param name="detection_mode" value="$(arg detection_mode)" />
+    <param name="row_model_file" value="$(arg row_model_file)" />
+    <param name="row_bandwidth" value="$(arg row_bandwidth)" />
+    <param name="tree_u_bin_size" value="$(arg tree_u_bin_size)" />
+    <param name="tree_smooth_window" value="$(arg tree_smooth_window)" />
+    <param name="tree_peak_min_fraction" value="$(arg tree_peak_min_fraction)" />
+    <param name="tree_min_separation" value="$(arg tree_min_separation)" />
+    <param name="tree_u_padding" value="$(arg tree_u_padding)" />
+    <param name="refine_u_half_width" value="$(arg refine_u_half_width)" />
+    <param name="max_trees_per_row" value="$(arg max_trees_per_row)" />
+
+    <param name="z_min" value="$(arg z_min)" />
+    <param name="z_max" value="$(arg z_max)" />
+    <param name="x_min" value="$(arg x_min)" />
+    <param name="x_max" value="$(arg x_max)" />
+    <param name="y_abs_max" value="$(arg y_abs_max)" />
+    <param name="max_points" value="$(arg max_points)" />
+    <param name="sample_seed" value="$(arg sample_seed)" />
+
+    <param name="cluster_cell_size" value="$(arg cluster_cell_size)" />
+    <param name="cluster_neighbor_range" value="$(arg cluster_neighbor_range)" />
+    <param name="min_points_per_tree" value="$(arg min_points_per_tree)" />
+    <param name="max_trees" value="$(arg max_trees)" />
+
+    <param name="radius_mode" value="$(arg radius_mode)" />
+    <param name="radius_constant" value="$(arg radius_constant)" />
+    <param name="radius_quantile" value="$(arg radius_quantile)" />
+    <param name="radius_min" value="$(arg radius_min)" />
+    <param name="radius_max" value="$(arg radius_max)" />
+
+    <param name="marker_type" value="$(arg marker_type)" />
+    <param name="circle_segments" value="$(arg circle_segments)" />
+    <param name="line_width" value="$(arg line_width)" />
+    <param name="alpha" value="$(arg alpha)" />
+    <param name="marker_z" value="$(arg marker_z)" />
+    <param name="color" value="$(arg color)" />
+
+    <param name="publish_labels" value="$(arg publish_labels)" />
+    <param name="label_height" value="$(arg label_height)" />
+    <param name="label_z_offset" value="$(arg label_z_offset)" />
+    <param name="label_start_index" value="$(arg label_start_index)" />
+
+    <param name="publish_clusters_cloud" value="$(arg publish_clusters_cloud)" />
+
+    <param name="export_csv" value="$(arg export_csv)" />
+  </node>
+</launch>

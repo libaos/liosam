@@ -1,0 +1,35 @@
+---
+# Orchard-friendly costmap tuning for Gazebo (velodyne pointcloud)
+footprint: [[0.575, 0.23], [0.575, -0.23], [-0.575, -0.23], [-0.575, 0.23]]
+
+transform_tolerance: 0.2
+always_send_full_costmap: true
+
+obstacle_layer:
+  enabled: true
+  obstacle_range: 4.0
+  raytrace_range: 6.0
+  # For a rolling-window local costmap, treating unknown space as obstacle is overly conservative
+  # and often makes TEB report "trajectory is not feasible" at startup.
+  track_unknown_space: false
+  combination_method: 1
+
+  observation_sources: velodyne_cloud
+  velodyne_cloud:
+    data_type: PointCloud2
+    topic: /velodyne_points
+    marking: true
+    clearing: true
+    min_obstacle_height: 0.2
+    max_obstacle_height: 2.0
+    obstacle_range: 4.0
+    raytrace_range: 6.0
+
+inflation_layer:
+  enabled: true
+  cost_scaling_factor: 15.0
+  inflation_radius: 0.25
+
+static_layer:
+  enabled: true
+  map_topic: "/map"

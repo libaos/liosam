@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="orchard_camera">
+    <static>true</static>
+    <link name="link">
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.0001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0001</iyy>
+          <iyz>0</iyz>
+          <izz>0.0001</izz>
+        </inertia>
+      </inertial>
+
+      <sensor name="orchard_camera" type="camera">
+        <always_on>true</always_on>
+        <update_rate>10</update_rate>
+        <camera>
+          <horizontal_fov>1.047</horizontal_fov>
+          <image>
+            <width>1280</width>
+            <height>720</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>120</far>
+          </clip>
+        </camera>
+        <plugin name="gazebo_ros_camera" filename="libgazebo_ros_camera.so">
+          <robotNamespace>/orchard_cam</robotNamespace>
+          <cameraName>camera</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+          <frameName>orchard_cam</frameName>
+        </plugin>
+      </sensor>
+    </link>
+  </model>
+</sdf>
+

@@ -1,0 +1,8 @@
+<launch>
+  <arg name="config" default="$(find orchard_row_mapping)/config/liorl_pretty.yaml" />
+
+  <node pkg="orchard_row_mapping" type="orchard_segmentation_node.py" name="orchard_segmentation" output="screen">
+    <env name="PYTHONPATH" value="/mysda/w/w/lio_ws/.venv_orchard/lib/python3.8/site-packages:$(optenv PYTHONPATH)" />
+    <rosparam file="$(arg config)" command="load" />
+  </node>
+</launch>

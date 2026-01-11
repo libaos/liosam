@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- 静态TF发布，将map坐标系连接到base_link -->
+  <node pkg="tf" type="static_transform_publisher" name="map_to_base_link"
+        args="0 0 0 0 0 0 map base_link 100" />
+        
+  <!-- 轨迹和代价地图可视化节点 -->
+  <node pkg="slope_costmap_layer" type="trajectory_costmap_visualizer" name="trajectory_costmap_visualizer" output="screen">
+    <!-- 点云文件路径 -->
+    <param name="pcd_file_path" value="/root/shared_dir/LIO-SAM/shangpo2map0.01/GlobalMap.pcd" />
+    <!-- 地图分辨率 -->
+    <param name="resolution" value="0.1" />
+    <!-- 轨迹CSV文件 -->
+    <param name="trajectory_csv" value="/root/lio_ws/trajectory_data/2025-07-09-15-57-19__liorl_mapping_path.csv" />
+    <!-- 障碍物高度阈值 -->
+    <param name="obstacle_threshold" value="0.3" />
+    <!-- 障碍物膨胀半径 -->
+    <param name="inflation_radius" value="0.5" />
+  </node>
+  
+  <!-- 启动Rviz进行可视化 -->
+  <node pkg="rviz" type="rviz" name="rviz" 
+        args="-d $(find slope_costmap_layer)/rviz/trajectory_costmap.rviz" />
+</launch> 

@@ -1,0 +1,7 @@
+TebLocalPlannerROS:
+  # Turning segments: slower forward, allow faster rotation.
+  max_vel_x: 0.30
+  max_vel_theta: 0.55
+  acc_lim_x: 0.25
+  acc_lim_theta: 0.80
+

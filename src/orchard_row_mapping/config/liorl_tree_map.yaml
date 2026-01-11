@@ -1,0 +1,43 @@
+pointcloud_topic: "/liorl/deskew/cloud_deskewed"
+
+# Export tree-only map for CloudCompare cleanup
+publish_tree_cloud: true
+publish_segmented_cloud: false
+publish_row_markers: false
+
+# More coverage for map building
+sampling: "random"          # random | stride | first
+sampling_seed: -1
+num_points: 16384
+
+num_classes: 2
+tree_class: 0
+
+# Keep more tree points (you can clean false positives later in CloudCompare)
+tree_prob_threshold: 0.5
+
+# Wider crop (still in incoming cloud frame, usually base_link_est)
+fit_x_min: 0.0
+fit_x_max: 40.0
+fit_y_abs_max: 12.0
+fit_z_min: -1.0
+fit_z_max: 4.0
+
+# Unused when publish_row_markers=false
+min_points_per_row: 120
+split_axis: "y"
+split_margin: 0.2
+line_inlier_distance: 0.3
+line_inlier_iterations: 2
+line_endpoint_percentile: 5.0
+fixed_line_length: 0.0
+line_smoothing_alpha: 0.0
+hold_last_seconds: 0.0
+marker_lifetime: 0.2
+
+row_width: 0.15
+row_alpha: 1.0
+label_colors:
+  "0": [56, 188, 75]
+  "1": [180, 180, 180]
+

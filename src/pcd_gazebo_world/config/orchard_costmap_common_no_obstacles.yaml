@@ -1,0 +1,16 @@
+---
+# Relaxed costmap config for full-path replay (no obstacle layer).
+footprint: [[0.575, 0.23], [0.575, -0.23], [-0.575, -0.23], [-0.575, 0.23]]
+
+transform_tolerance: 0.2
+always_send_full_costmap: true
+
+obstacle_layer:
+  enabled: false
+
+inflation_layer:
+  enabled: false
+
+static_layer:
+  enabled: true
+  map_topic: "/map"

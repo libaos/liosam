@@ -1,0 +1,37 @@
+# Stable row lines from a fixed global map + liorl localization
+
+global_map_topic: "/liorl/localization/global_map"
+map_frame: "map"
+base_frame: "base_link_est"
+
+publish_rate: 10.0
+tf_timeout: 0.2
+
+# Optional: read map directly from PCD (if you don't want to depend on the topic)
+# pcd_path: "/mysda/w/w/lio_ws/maps/GlobalMap.pcd"
+
+# Optional: cache extracted row model (faster startup next time)
+# row_model_file: "~/.ros/orchard_row_model.json"
+
+# Filter map points before extracting rows
+map_z_min: 0.0
+map_z_max: 3.0
+map_x_min: -1.0e9
+map_x_max: 1.0e9
+map_y_abs_max: 1.0e9
+max_map_points: 200000
+
+# 1D clustering on lateral axis (meters)
+row_cluster_gap: 0.8
+min_points_per_row: 200
+u_percentile: 2.0
+
+# Visualization
+line_length: 20.0
+line_width: 0.15
+line_alpha: 1.0
+marker_z: 0.0
+marker_lifetime: 0.3
+
+publish_all_rows: false
+publish_centerline: true

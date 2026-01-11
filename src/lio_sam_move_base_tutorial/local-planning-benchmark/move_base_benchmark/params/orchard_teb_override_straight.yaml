@@ -1,0 +1,7 @@
+TebLocalPlannerROS:
+  # Straight segments: faster forward, softer rotation.
+  max_vel_x: 0.55
+  max_vel_theta: 0.25
+  acc_lim_x: 0.35
+  acc_lim_theta: 0.45
+

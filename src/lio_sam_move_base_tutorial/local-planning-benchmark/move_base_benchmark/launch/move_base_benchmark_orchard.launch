@@ -1,0 +1,52 @@
+<launch>
+  <!-- Orchard-tuned move_base_benchmark (narrow rows / close obstacles). -->
+
+  <param name="/use_sim_time" value="false" />
+
+  <arg name="log_filename" default="$(find move_base_benchmark)/launch/log.txt" />
+  <arg name="map_filename" default="/root/Downloads/map.yaml" />
+  <arg name="global_frame" value="map" />
+
+  <!-- Odometry topic for navigation (override as needed) -->
+  <arg name="odom_topic" default="lio_sam/mapping/odometry_incremental" />
+
+  <!-- Param files -->
+  <arg name="costmap_common_params" default="$(find move_base_benchmark)/params/orchard_costmap_common_params.yaml" />
+  <arg name="global_costmap_params" default="$(find move_base_benchmark)/params/global_costmap_params.yaml" />
+  <arg name="local_costmap_params" default="$(find move_base_benchmark)/params/orchard_local_costmap_params.yaml" />
+  <arg name="local_planner_params" default="$(find move_base_benchmark)/params/orchard_psolqr_local_planner_params.yaml" />
+
+  <!-- Navigation -->
+  <node pkg="move_base_benchmark" type="move_base_benchmark" respawn="false" name="move_base_benchmark" output="screen">
+    <rosparam file="$(arg costmap_common_params)" command="load" ns="global_costmap" />
+    <rosparam file="$(arg costmap_common_params)" command="load" ns="local_costmap" />
+    <rosparam file="$(arg global_costmap_params)" command="load" />
+    <rosparam file="$(arg local_costmap_params)" command="load" />
+
+    <param name="global_costmap/global_frame" value="$(arg global_frame)" />
+    <param name="local_costmap/global_frame" value="odom_est" />
+    <param name="global_costmap/robot_base_frame" value="base_link_est" />
+    <param name="local_costmap/robot_base_frame" value="base_link_est" />
+
+    <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+    <param name="planner_frequency" value="10.0" />
+    <param name="planner_patience" value="5.0" />
+
+    <param name="base_local_planner" value="psolqr_planner/PsoLqrPlanner" />
+    <rosparam file="$(arg local_planner_params)" command="load" />
+    <param name="controller_frequency" value="10.0" />
+    <param name="controller_patience" value="15.0" />
+
+    <param name="log_filename" value="$(arg log_filename)" />
+    <remap from="odom" to="$(arg odom_topic)" />
+  </node>
+
+  <!-- Map -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_filename)" output="screen">
+    <param name="frame_id" value="$(arg global_frame)" />
+  </node>
+
+  <!-- RViz (optional) -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find move_base_benchmark)/launch/rviz_navigation.rviz" />
+</launch>
+

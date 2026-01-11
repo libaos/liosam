@@ -1,0 +1,40 @@
+<launch>
+  <arg name="cloud_topic" default="/liorl/deskew/cloud_deskewed" />
+  <arg name="mode_topic" default="/fsm/mode" />
+
+  <arg name="process_hz" default="2.0" />
+  <arg name="baseline_s" default="1.0" />
+  <arg name="history_s" default="4.0" />
+  <arg name="max_points" default="60000" />
+
+  <arg name="num_ring" default="20" />
+  <arg name="num_sector" default="60" />
+  <arg name="max_radius" default="80.0" />
+  <arg name="lidar_height" default="2.0" />
+  <arg name="search_ratio" default="0.1" />
+
+  <arg name="sc_dist_max" default="0.35" />
+  <arg name="yaw_rate_threshold" default="0.25" />
+  <arg name="consistency_n" default="3" />
+
+  <node pkg="orchard_scancontext_fsm" type="scancontext_fsm_node.py" name="scancontext_fsm" output="screen">
+    <param name="cloud_topic" value="$(arg cloud_topic)" />
+    <param name="mode_topic" value="$(arg mode_topic)" />
+
+    <param name="process_hz" value="$(arg process_hz)" />
+    <param name="baseline_s" value="$(arg baseline_s)" />
+    <param name="history_s" value="$(arg history_s)" />
+    <param name="max_points" value="$(arg max_points)" />
+
+    <param name="num_ring" value="$(arg num_ring)" />
+    <param name="num_sector" value="$(arg num_sector)" />
+    <param name="max_radius" value="$(arg max_radius)" />
+    <param name="lidar_height" value="$(arg lidar_height)" />
+    <param name="search_ratio" value="$(arg search_ratio)" />
+
+    <param name="sc_dist_max" value="$(arg sc_dist_max)" />
+    <param name="yaw_rate_threshold" value="$(arg yaw_rate_threshold)" />
+    <param name="consistency_n" value="$(arg consistency_n)" />
+  </node>
+</launch>
+

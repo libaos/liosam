@@ -1,0 +1,66 @@
+<launch>
+  <!-- One-command visualization: tree map + per-tree circles (+ optional row prior) + RViz -->
+
+  <arg name="pcd_path" default="/mysda/w/w/lio_ws/maps/TreeMap_full.pcd" />
+  <arg name="map_frame" default="map" />
+  <arg name="pcd_topic" default="/orchard_tree_map_builder/tree_map" />
+
+  <arg name="enable_pcd_publisher" default="true" />
+  <arg name="enable_tree_circles" default="true" />
+  <arg name="enable_row_prior" default="true" />
+
+  <arg name="row_config" default="$(find orchard_row_mapping)/config/liorl_tree_prior.yaml" />
+  <arg name="row_model_file" default="$(find orchard_row_mapping)/config/row_model_pca_major.json" />
+
+  <!-- Row markers: default to tree rows (no blue centerlines) -->
+  <arg name="publish_all_rows" default="true" />
+  <arg name="publish_nearest_rows" default="0" />
+  <arg name="colorize_all_rows" default="false" />
+
+  <arg name="publish_all_centerlines" default="false" />
+  <arg name="publish_nearest_centerlines" default="0" />
+  <arg name="publish_centerline" default="false" />
+  <arg name="publish_row_boundaries" default="false" />
+  <arg name="publish_centerline_labels" default="false" />
+  <arg name="row_v_offsets" default="" />
+
+  <arg name="enable_rviz" default="true" />
+  <arg name="rviz_config" default="$(find orchard_row_mapping)/config/orchard_row_mapping.rviz" />
+
+  <group if="$(arg enable_pcd_publisher)">
+    <include file="$(find orchard_row_mapping)/launch/pcd_publisher.launch">
+      <arg name="pcd_path" value="$(arg pcd_path)" />
+      <arg name="topic" value="$(arg pcd_topic)" />
+      <arg name="frame_id" value="$(arg map_frame)" />
+    </include>
+  </group>
+
+  <group if="$(arg enable_row_prior)">
+    <include file="$(find orchard_row_mapping)/launch/orchard_row_prior.launch">
+      <arg name="config" value="$(arg row_config)" />
+      <arg name="pcd_path" value="$(arg pcd_path)" />
+      <arg name="row_model_file" value="$(arg row_model_file)" />
+      <arg name="publish_all_rows" value="$(arg publish_all_rows)" />
+      <arg name="publish_nearest_rows" value="$(arg publish_nearest_rows)" />
+      <arg name="colorize_all_rows" value="$(arg colorize_all_rows)" />
+      <arg name="publish_all_centerlines" value="$(arg publish_all_centerlines)" />
+      <arg name="publish_nearest_centerlines" value="$(arg publish_nearest_centerlines)" />
+      <arg name="publish_centerline" value="$(arg publish_centerline)" />
+      <arg name="publish_row_boundaries" value="$(arg publish_row_boundaries)" />
+      <arg name="publish_centerline_labels" value="$(arg publish_centerline_labels)" />
+      <arg name="row_v_offsets" value="$(arg row_v_offsets)" />
+    </include>
+  </group>
+
+  <group if="$(arg enable_tree_circles)">
+    <include file="$(find orchard_row_mapping)/launch/orchard_tree_circles.launch">
+      <arg name="pcd_path" value="$(arg pcd_path)" />
+      <arg name="map_frame" value="$(arg map_frame)" />
+      <arg name="row_model_file" value="$(arg row_model_file)" />
+    </include>
+  </group>
+
+  <group if="$(arg enable_rviz)">
+    <node pkg="rviz" type="rviz" name="orchard_rviz" args="-d $(arg rviz_config)" output="screen" />
+  </group>
+</launch>

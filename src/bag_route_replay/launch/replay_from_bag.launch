@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="bag_path" default="" />
+  <arg name="path_topic" default="" />
+  <arg name="action_name" default="move_base" />
+  <arg name="goal_frame" default="" />
+  <arg name="robot_frame" default="base_link_est" />
+  <arg name="min_dist" default="1.0" />
+  <arg name="max_waypoints" default="0" />
+  <arg name="start_nearest" default="true" />
+  <arg name="start_index" default="0" />
+  <arg name="goal_timeout" default="60.0" />
+  <arg name="skip_failed" default="true" />
+  <arg name="loop" default="false" />
+  <arg name="publish_path" default="true" />
+  <arg name="transform_timeout" default="5.0" />
+
+  <node pkg="bag_route_replay" type="bag_route_replay_node.py" name="bag_route_replay" output="screen">
+    <param name="bag_path" value="$(arg bag_path)" />
+    <param name="path_topic" value="$(arg path_topic)" />
+    <param name="action_name" value="$(arg action_name)" />
+    <param name="goal_frame" value="$(arg goal_frame)" />
+    <param name="robot_frame" value="$(arg robot_frame)" />
+    <param name="min_dist" value="$(arg min_dist)" />
+    <param name="max_waypoints" value="$(arg max_waypoints)" />
+    <param name="start_nearest" value="$(arg start_nearest)" />
+    <param name="start_index" value="$(arg start_index)" />
+    <param name="goal_timeout" value="$(arg goal_timeout)" />
+    <param name="skip_failed" value="$(arg skip_failed)" />
+    <param name="loop" value="$(arg loop)" />
+    <param name="publish_path" value="$(arg publish_path)" />
+    <param name="transform_timeout" value="$(arg transform_timeout)" />
+  </node>
+</launch>

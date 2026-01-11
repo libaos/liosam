@@ -1,0 +1,15 @@
+# One topic per line, # comments allowed.
+# Minimal topics needed for evaluate_run.py (it auto-detects nav_msgs/Path in the run bag).
+/lio_sam/mapping/path
+/liorl/mapping/path
+
+# Recommended extras for analysis / paper plots:
+/cmd_vel
+/tf
+/tf_static
+/move_base/status
+/move_base/result
+
+# Optional (FSM switching analysis):
+/fsm/mode
+

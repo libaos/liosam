@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Logs / runtime
+*.log
+.ros/
+.ros_*/
+
+# Editor backups
+*~
+*.swp
+*.bak
+
+# Data artifacts (keep maps in workspace root, not here)
+*.pcd
+*.ply
+*.vtk
+*.bag
+*.bag.active
+

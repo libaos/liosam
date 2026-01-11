@@ -1,0 +1,77 @@
+<launch>
+  <arg name="world_name" default="$(find pcd_gazebo_world)/worlds/orchard_from_pcd.world"/>
+  <arg name="paused" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gazebo_master_uri" default="$(optenv GAZEBO_MASTER_URI http://localhost:11345)"/>
+  <arg name="gazebo_ip" default="$(optenv GAZEBO_IP 127.0.0.1)"/>
+  <arg name="pub_clock_frequency" default="100"/>
+
+  <arg name="spawn_robot" default="true"/>
+  <arg name="enable_robot_state_publisher" default="false"/>
+  <arg name="publish_static_sensor_tf" default="true"/>
+  <arg name="model_xacro" default="$(find scout_gazebo)/urdf/base_no_realsense.xacro"/>
+  <arg name="gpu" default="true"/>
+  <arg name="organize_cloud" default="true"/>
+  <arg name="lidar_hz" default="10"/>
+  <arg name="lidar_samples" default="440"/>
+  <!-- Drive plugin selection: enabling both skid_steer + planar_move can make the robot "乱跑". -->
+  <arg name="use_skid_steer" default="false"/>
+  <arg name="use_planar_move" default="true"/>
+  <arg name="x" default="0.0"/>
+  <arg name="y" default="0.0"/>
+  <arg name="z" default="0.2"/>
+  <arg name="yaw" default="0.0"/>
+
+  <env
+    name="GAZEBO_MODEL_PATH"
+    value="$(find pcd_gazebo_world)/models:/usr/share/gazebo-11/models:$(optenv GAZEBO_MODEL_PATH)"/>
+  <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
+  <env name="GAZEBO_MASTER_URI" value="$(arg gazebo_master_uri)"/>
+  <env name="GAZEBO_IP" value="$(arg gazebo_ip)"/>
+
+  <param name="use_sim_time" value="$(arg use_sim_time)"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(arg world_name)"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="pub_clock_frequency" value="$(arg pub_clock_frequency)"/>
+  </include>
+
+  <group if="$(arg spawn_robot)">
+    <param
+      name="robot_description"
+      command="$(find xacro)/xacro $(arg model_xacro) gpu:=$(arg gpu) organize_cloud:=$(arg organize_cloud) lidar_hz:=$(arg lidar_hz) lidar_samples:=$(arg lidar_samples) use_skid_steer:=$(arg use_skid_steer) use_planar_move:=$(arg use_planar_move)"/>
+
+    <node
+      pkg="gazebo_ros"
+      type="spawn_model"
+      name="spawn_scout"
+      args="-urdf -model scout -x $(arg x) -y $(arg y) -z $(arg z) -Y $(arg yaw) -param robot_description"/>
+
+    <node if="$(arg enable_robot_state_publisher)" name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+      <param name="publish_frequency" value="40.0"/>
+    </node>
+
+    <node
+      if="$(arg publish_static_sensor_tf)"
+      pkg="tf2_ros"
+      type="static_transform_publisher"
+      name="static_tf_base_link_to_base_footprint"
+      args="0 0 -0.25749 0 0 0 base_link base_footprint"/>
+    <node
+      if="$(arg publish_static_sensor_tf)"
+      pkg="tf2_ros"
+      type="static_transform_publisher"
+      name="static_tf_base_link_to_velodyne"
+      args="0.175 0 0.75751 0 0 0 base_link velodyne"/>
+    <node
+      if="$(arg publish_static_sensor_tf)"
+      pkg="tf2_ros"
+      type="static_transform_publisher"
+      name="static_tf_base_link_to_imu"
+      args="0.175 0 0.65751 0 0 0 base_link imu_base"/>
+  </group>
+</launch>

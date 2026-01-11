@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- 点云文件路径 -->
+  <arg name="pcd_file_path" default="/root/shared_dir/LIO-SAM/shangpo2map0.01/GlobalMap.pcd"/>
+  <arg name="resolution" default="0.1"/>
+  
+  <!-- 发布静态TF变换 -->
+  <node pkg="tf" type="static_transform_publisher" name="map_to_base_link" 
+        args="0 0 0 0 0 0 map base_link 100" />
+  
+  <!-- 启动Move Base风格代价地图节点 -->
+  <node pkg="slope_costmap_layer" type="move_base_style_costmap" name="move_base_style_costmap" output="screen">
+    <param name="pcd_file_path" value="$(arg pcd_file_path)"/>
+    <param name="resolution" value="$(arg resolution)"/>
+  </node>
+  
+  <!-- 启动RViz -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find slope_costmap_layer)/rviz/move_base_style_costmap.rviz"/>
+</launch> 

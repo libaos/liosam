@@ -1,0 +1,16 @@
+<launch>
+  <arg name="pcd_path" default="/mysda/w/w/lio_ws/maps/TreeMap_full.pcd" />
+  <arg name="topic" default="/orchard_tree_map_builder/tree_map" />
+  <arg name="frame_id" default="map" />
+  <arg name="publish_max_points" default="0" />
+  <arg name="sample_seed" default="0" />
+
+  <node pkg="orchard_row_mapping" type="pcd_publisher_node.py" name="pcd_publisher" output="screen">
+    <param name="pcd_path" value="$(arg pcd_path)" />
+    <param name="topic" value="$(arg topic)" />
+    <param name="frame_id" value="$(arg frame_id)" />
+    <param name="publish_max_points" value="$(arg publish_max_points)" />
+    <param name="sample_seed" value="$(arg sample_seed)" />
+  </node>
+</launch>
+

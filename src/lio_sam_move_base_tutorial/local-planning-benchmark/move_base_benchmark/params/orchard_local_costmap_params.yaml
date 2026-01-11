@@ -1,0 +1,17 @@
+local_costmap:
+  global_frame: odom_est
+  robot_base_frame: base_link_est
+  update_frequency: 10.0
+  publish_frequency: 10.0
+  rolling_window: true
+  width: 5.5
+  height: 5.5
+  resolution: 0.05
+  transform_tolerance: 0.5
+
+  # Orchard rows: local costmap usually should NOT include static_layer, otherwise the 2D map may be too conservative
+  # (tree crowns/trunks become thick obstacles) and the robot stops early. Use scan for local obstacles.
+  plugins:
+    - { name: obstacle_layer, type: "costmap_2d::ObstacleLayer" }
+    - { name: inflation_layer, type: "costmap_2d::InflationLayer" }
+

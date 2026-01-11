@@ -1,0 +1,7 @@
+<library path="lib/libslope_costmap_layer">
+  <class type="slope_costmap_layer::SlopeCostmapLayer" base_class_type="costmap_2d::Layer">
+    <description>
+      A costmap layer that uses slope information from point cloud data to generate costs.
+    </description>
+  </class>
+</library> 

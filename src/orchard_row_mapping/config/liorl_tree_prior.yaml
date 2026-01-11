@@ -1,0 +1,38 @@
+global_map_topic: "/liorl/localization/global_map"
+map_frame: "map"
+base_frame: "base_link_est"
+
+publish_rate: 10.0
+tf_timeout: 0.2
+
+# Build rows from a tree-only map (PCD passed via launch arg)
+row_direction_mode: "pca_major"   # auto | pca_major | pca_minor | manual_yaw
+row_direction_yaw_deg: 0.0        # used only when row_direction_mode=manual_yaw
+row_detection: "histogram"
+hist_bin_size: 0.1
+hist_smooth_window: 9
+hist_peak_min_fraction: 0.08
+row_center_min_separation: 2.0
+
+# Filter map points before extracting rows
+map_z_min: -1.0
+map_z_max: 4.0
+map_x_min: -1.0e9
+map_x_max: 1.0e9
+map_y_abs_max: 1.0e9
+max_map_points: 200000
+
+# Unused when row_detection=histogram (kept for compatibility)
+row_cluster_gap: 0.8
+min_points_per_row: 200
+u_percentile: 2.0
+
+# Visualization
+line_length: 20.0
+line_width: 0.15
+line_alpha: 1.0
+marker_z: 0.0
+marker_lifetime: 0.3
+
+publish_all_rows: false
+publish_centerline: true

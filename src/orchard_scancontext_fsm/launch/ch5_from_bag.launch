@@ -1,0 +1,48 @@
+<launch>
+  <arg name="bag" default="" />
+  <arg name="rate" default="1" />
+  <arg name="bag_args" default="" />
+  <arg name="topics" default="/liorl/deskew/cloud_deskewed /tf /liorl/mapping/path" />
+  <arg name="cloud_topic" default="/liorl/deskew/cloud_deskewed" />
+
+  <arg name="enable_orchard_segmentation" default="true" />
+  <arg name="orchard_config" default="$(find orchard_row_mapping)/config/liorl_pretty.yaml" />
+
+  <arg name="enable_tree_clustering" default="true" />
+  <arg name="tree_cluster_input" default="/orchard_segmentation/tree_cloud" />
+  <arg name="tree_cluster_process_hz" default="2.0" />
+  <arg name="tree_cluster_z_min" default="0.7" />
+  <arg name="tree_cluster_z_max" default="1.3" />
+  <arg name="tree_cluster_cell_size" default="0.10" />
+  <arg name="tree_cluster_min_points" default="40" />
+
+  <arg name="record" default="false" />
+  <arg name="out_bag" default="" />
+  <arg name="record_topics" default="/fsm/mode /liorl/mapping/path" />
+
+  <param name="/use_sim_time" value="true" />
+
+  <include if="$(arg enable_orchard_segmentation)" file="$(find orchard_row_mapping)/launch/orchard_row_liorl_pretty.launch">
+    <arg name="config" value="$(arg orchard_config)" />
+  </include>
+
+  <node if="$(arg enable_tree_clustering)" pkg="orchard_row_mapping" type="orchard_tree_clusters_node.py"
+        name="orchard_tree_clusters" output="screen">
+    <param name="input_topic" value="$(arg tree_cluster_input)" />
+    <param name="process_hz" value="$(arg tree_cluster_process_hz)" />
+    <param name="z_min" value="$(arg tree_cluster_z_min)" />
+    <param name="z_max" value="$(arg tree_cluster_z_max)" />
+    <param name="cluster_cell_size" value="$(arg tree_cluster_cell_size)" />
+    <param name="min_points_per_tree" value="$(arg tree_cluster_min_points)" />
+  </node>
+
+  <include file="$(find orchard_scancontext_fsm)/launch/scancontext_fsm.launch">
+    <arg name="cloud_topic" value="$(arg cloud_topic)" />
+  </include>
+
+  <node if="$(arg record)" pkg="rosbag" type="record" name="ch5_record" output="screen"
+        args="-O $(arg out_bag) $(arg record_topics)" />
+
+  <node pkg="rosbag" type="play" name="ch5_play" output="screen" required="true"
+        args="--clock -r $(arg rate) -q $(arg bag) $(arg bag_args) --topics $(arg topics)" />
+</launch>

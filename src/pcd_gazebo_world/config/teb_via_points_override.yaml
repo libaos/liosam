@@ -1,0 +1,16 @@
+TebLocalPlannerROS:
+  global_plan_viapoint_sep: -1.0
+  via_points_ordered: true
+  # Bias toward the rosbag path so the global planner's straight-line segments don't cut corners.
+  weight_viapoint: 5.0
+
+  # The default orchard params are conservative and can get stuck once pointcloud obstacles appear.
+  # Relax a bit so the robot can keep moving in narrow rows.
+  min_obstacle_dist: 0.2
+  inflation_dist: 0.3
+
+  # Use the real robot footprint (1.15m x 0.46m) instead of the default oversized footprint.
+  footprint: [[0.575, 0.23], [0.575, -0.23], [-0.575, -0.23], [-0.575, 0.23]]
+  footprint_model:
+    type: "polygon"
+    vertices: [[0.575, 0.23], [0.575, -0.23], [-0.575, -0.23], [-0.575, 0.23]]

@@ -1,0 +1,48 @@
+PsoLqrPlanner:
+  # Copy of psolqr_local_planner_params.yaml with less conservative obstacle penalty in narrow rows.
+
+  n_particles: 20
+  n_inherited: 6
+  pointNum: 5
+  max_speed: 15
+  w_inertial: 1.0
+  w_social: 2.0
+  w_cognitive: 1.2
+
+  # NOTE: In this planner, larger obs_factor generally makes it less sensitive to "inflated" costs
+  # (i.e. it will not stop too early when trees are close), but DO NOT set it too high.
+  obs_factor: 0.75
+
+  pso_state_init_ratio: 0.2
+  pso_disturbance_state_init_ratio: 0.6
+  pub_particles: false
+  pso_max_iter: 5
+
+  global_dist_behind_robot: 0.1
+  global_max_path_length: 3
+  global_dist_threshold: 2.8
+
+  goal_dist_tolerance: 0.2
+  rotate_tolerance: 0.5
+
+  lqr_max_iter: 100
+  lqr_eps_iter: 1e-1
+
+  max_v: 0.5
+  min_v: 0.0
+  max_v_inc: 0.5
+
+  max_w: 1.57
+  min_w: 0.0
+  max_w_inc: 1.57
+
+  base_frame: base_link_est
+  map_frame: map
+
+  lookahead_time: 1.0
+  min_lookahead_dist: 0.3
+  max_lookahead_dist: 0.9
+
+  Q_matrix_diag: [1.0, 1.0, 1.0]
+  R_matrix_diag: [1.0, 1.0]
+
