@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="world_name" default="$(find pcd_gazebo_world)/worlds/orchard_rows.world"/>
+  <arg name="paused" default="false"/>
+  <arg name="gazebo_master_uri" default="$(optenv GAZEBO_MASTER_URI http://localhost:11345)"/>
+  <arg name="gazebo_ip" default="$(optenv GAZEBO_IP 127.0.0.1)"/>
+
+  <arg name="spawn_robot" default="true"/>
+  <arg name="enable_robot_state_publisher" default="true"/>
+
+  <!-- Reduce GPU/display assumptions for headless runs. -->
+  <arg name="gpu" default="false"/>
+  <arg name="organize_cloud" default="false"/>
+  <arg name="use_skid_steer" default="false"/>
+  <arg name="use_planar_move" default="true"/>
+
+  <include file="$(find pcd_gazebo_world)/launch/orchard_sim.launch">
+    <arg name="world_name" value="$(arg world_name)"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gazebo_master_uri" value="$(arg gazebo_master_uri)"/>
+    <arg name="gazebo_ip" value="$(arg gazebo_ip)"/>
+
+    <arg name="spawn_robot" value="$(arg spawn_robot)"/>
+    <arg name="enable_robot_state_publisher" value="$(arg enable_robot_state_publisher)"/>
+    <arg name="gpu" value="$(arg gpu)"/>
+    <arg name="organize_cloud" value="$(arg organize_cloud)"/>
+    <arg name="use_skid_steer" value="$(arg use_skid_steer)"/>
+    <arg name="use_planar_move" value="$(arg use_planar_move)"/>
+  </include>
+</launch>

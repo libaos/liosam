@@ -26,7 +26,7 @@
 
 ## Quick Start (3 min)
 
-这条路径**不需要编译**工作区（只要 ROS 能找到 `src/` 下的包即可）。推荐先跑一个最小闭环：启动果园 Gazebo world + 机器人，然后用 RViz 看 TF/机器人模型/点云话题。
+推荐走“正统 catkin 工作区”方式：编译 → `source devel/setup.bash` → `roslaunch`。
 
 ### 0) Prerequisites
 
@@ -46,20 +46,23 @@ cd liosam
 
 ```bash
 source /opt/ros/noetic/setup.bash
-export ROS_PACKAGE_PATH="$PWD/src:${ROS_PACKAGE_PATH}"
+catkin_make -DCMAKE_BUILD_TYPE=Release
+source devel/setup.bash
 ```
 
-### 3) Run Gazebo orchard sim (robot included)
+> 如果你是全新系统、编译报缺依赖：先跑 `rosdep install --from-paths src --ignore-src -r -y --rosdistro noetic`（见 `docs/FAQ.md`）。
+
+### 3) Run Gazebo orchard sim (headless)
 
 ```bash
-roslaunch pcd_gazebo_world orchard_sim.launch \
-  enable_robot_state_publisher:=true
+roslaunch liosam_bringup orchard_sim_headless.launch
 ```
 
 常见可选项：
 
-- `gui:=false`：无界面跑 `gzserver`（适合远程/无显卡）
+- `paused:=true`：启动后暂停物理仿真（更省资源）
 - `world_name:=.../xxx.world`：换 world（见 `src/pcd_gazebo_world/worlds/`）
+- 需要 GUI：`roslaunch pcd_gazebo_world orchard_sim.launch gui:=true enable_robot_state_publisher:=true`
 
 ### 4) View in RViz
 
@@ -68,7 +71,7 @@ roslaunch pcd_gazebo_world orchard_sim.launch \
 ```bash
 cd liosam
 source /opt/ros/noetic/setup.bash
-export ROS_PACKAGE_PATH="$PWD/src:${ROS_PACKAGE_PATH}"
+source devel/setup.bash
 
 rviz -d "$(rospack find scout_gazebo)/config/show_robot.rviz"
 ```
@@ -88,16 +91,20 @@ rviz -d "$(rospack find scout_gazebo)/config/show_robot.rviz"
 
 工作区里包很多，这里列最常用的入口（都在 `src/` 下）：
 
+- `liosam_bringup`: 仓库级 bringup/统一 demo 入口（入口文档：`src/liosam_bringup/README.md`）
 - `pcd_gazebo_world`: PCD→Gazebo 地形、果园 world 生成、Gazebo/回放脚本（入口文档：`src/pcd_gazebo_world/README.md`）
 - `orchard_row_mapping`: 点云分割（RandLA-Net）+ 果树行拟合（入口文档：`src/orchard_row_mapping/README.md`）
 - `lio_sam_move_base_tutorial`: 机器人仿真/导航相关包集合（包含 `scout_gazebo`、`teb_local_planner` 等）
 - `psolqr_local_planner`: 另一个局部规划器插件（PSO + LQR）
 - `continuous_navigation`: waypoint/连续导航小工具
 
+更完整的分组清单见 `docs/PACKAGES.md`。
+
 ## Repository Layout
 
 ```text
 .
+├── docs/                   # 常见问题/架构/说明文档
 ├── src/                    # ROS1 catkin packages（主要代码都在这里）
 ├── tools/                  # 仓库级脚本/工具
 ├── README.md               # 你正在看的文档

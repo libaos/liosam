@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>liosam_bringup</name>
+  <version>0.1.0</version>
+  <description>Workspace-level bringup / demo launch files for the liosam catkin workspace.</description>
+
+  <maintainer email="user@example.com">liosam maintainers</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>pcd_gazebo_world</exec_depend>
+  <exec_depend>scout_gazebo</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+
+  <export/>
+</package>
