@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="liosam_bringup" type="smoke_node" name="liosam_smoke" output="screen"/>
+</launch>

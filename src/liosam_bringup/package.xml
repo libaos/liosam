@@ -9,6 +9,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <build_depend>roscpp</build_depend>
+  <exec_depend>roscpp</exec_depend>
+
   <exec_depend>pcd_gazebo_world</exec_depend>
   <exec_depend>scout_gazebo</exec_depend>
   <exec_depend>gazebo_ros</exec_depend>

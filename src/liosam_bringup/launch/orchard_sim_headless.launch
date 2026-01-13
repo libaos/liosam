@@ -6,7 +6,7 @@
   <arg name="gazebo_ip" default="$(optenv GAZEBO_IP 127.0.0.1)"/>
 
   <arg name="spawn_robot" default="true"/>
-  <arg name="enable_robot_state_publisher" default="true"/>
+  <arg name="enable_robot_state_publisher" default="false"/>
 
   <!-- Reduce GPU/display assumptions for headless runs. -->
   <arg name="gpu" default="false"/>

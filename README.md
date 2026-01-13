@@ -52,13 +52,19 @@ source devel/setup.bash
 
 > 如果你是全新系统、编译报缺依赖：先跑 `rosdep install --from-paths src --ignore-src -r -y --rosdistro noetic`（见 `docs/FAQ.md`）。
 
-### 3) Run Gazebo orchard sim (headless)
+### 3) Smoke test (no data, no GUI)
+
+```bash
+roslaunch liosam_bringup smoke.launch
+```
+
+### 4) (Optional) Run Gazebo orchard sim (headless)
 
 ```bash
 roslaunch liosam_bringup orchard_sim_headless.launch
 ```
 
-常见可选项：
+常见可选项（Gazebo）：
 
 - `paused:=true`：启动后暂停物理仿真（更省资源）
 - `world_name:=.../xxx.world`：换 world（见 `src/pcd_gazebo_world/worlds/`）

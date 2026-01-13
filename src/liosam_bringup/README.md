@@ -4,6 +4,7 @@
 
 ## Launches
 
+- `smoke.launch`: 最小 smoke（只启动一个空转节点，用于验证 `roslaunch`/环境/编译产物）。
 - `orchard_sim_headless.launch`: 启动 `pcd_gazebo_world/orchard_sim.launch`，默认 `gui:=false`，适合远程/无显示环境。
 
 ## Usage
@@ -12,6 +13,8 @@
 source /opt/ros/noetic/setup.bash
 catkin_make
 source devel/setup.bash
+
+roslaunch liosam_bringup smoke.launch
 
 roslaunch liosam_bringup orchard_sim_headless.launch
 ```
