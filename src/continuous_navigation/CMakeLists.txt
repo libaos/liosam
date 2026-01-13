@@ -15,7 +15,6 @@ find_package(yaml-cpp REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS roscpp std_msgs geometry_msgs move_base_msgs actionlib tf
-  DEPENDS yaml-cpp
 )
 
 include_directories(
@@ -43,8 +42,13 @@ target_link_libraries(simple_two_points_navigator
 )
 
 # Install targets
-install(TARGETS waypoint_navigator
+install(TARGETS waypoint_navigator simple_two_points_navigator
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
 )
 
 # Install launch files

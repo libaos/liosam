@@ -6,11 +6,34 @@ find_package(catkin REQUIRED COMPONENTS
   costmap_2d
   pluginlib
   pcl_ros
-  grid_map_ros
-  grid_map_pcl
 )
 
 find_package(PCL REQUIRED)
+find_package(grid_map_ros QUIET)
+find_package(grid_map_pcl QUIET)
+
+if(NOT grid_map_ros_FOUND OR NOT grid_map_pcl_FOUND)
+  message(WARNING "grid_map_ros/grid_map_pcl not found; skipping slope_costmap_layer build. Install ros-$ENV{ROS_DISTRO}-grid-map to enable.")
+
+  catkin_package(
+    INCLUDE_DIRS include
+    CATKIN_DEPENDS roscpp costmap_2d pluginlib pcl_ros
+  )
+
+  install(DIRECTORY launch/ config/ rviz/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  )
+  return()
+endif()
+
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  costmap_2d
+  pluginlib
+  pcl_ros
+  grid_map_ros
+  grid_map_pcl
+)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -68,10 +91,17 @@ target_link_libraries(trajectory_costmap_visualizer
   ${PCL_LIBRARIES}
 )
 
-install(TARGETS slope_costmap_layer
+install(TARGETS
+    slope_costmap_layer
+    process_global_map
+    move_base_style_costmap
+    slope_visualization_costmap
+    slope_normal_visualization
+    ground_slope_visualization
+    trajectory_costmap_visualizer
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 install(FILES slope_costmap_layer_plugin.xml
