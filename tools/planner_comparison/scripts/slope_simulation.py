@@ -335,6 +335,8 @@ class SlopeSimulation:
         print("坡道场景模拟完成！")
 
 if __name__ == "__main__":
-    output_dir = os.path.expanduser("/root/lio_ws/src/planner_comparison/results")
-    simulator = SlopeSimulation(output_dir)
-    simulator.run_all_simulations() 
+    from pathlib import Path
+
+    output_dir = Path(__file__).resolve().parents[1] / "results"
+    simulator = SlopeSimulation(str(output_dir))
+    simulator.run_all_simulations()

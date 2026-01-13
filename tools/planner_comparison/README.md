@@ -42,7 +42,7 @@ pip install numpy matplotlib scipy reportlab
 2. 运行模拟和报告生成：
 
 ```bash
-cd /root/lio_ws/src/planner_comparison
+cd <repo_root>/tools/planner_comparison
 ./run_simulation.sh
 ```
 

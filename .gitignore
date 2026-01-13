@@ -67,6 +67,12 @@ __pycache__/
 /map*.bin
 /trace_nvidia_smi.txt
 
+# Local outputs inside packages
+/src/pcd_gazebo_world/maps/runs/
+/src/pcd_gazebo_world/maps/orchard_from_cloud_registered_full_0p7_1p3/
+/src/pcd_gazebo_world/tools/ros_sandbox/
+/src/pcd_gazebo_world/scripts/capture_pointcloud_bev_svg.py
+
 # Local backups created during repo cleanup
 .git_backup_*
 

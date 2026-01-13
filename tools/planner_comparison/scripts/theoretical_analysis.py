@@ -244,6 +244,8 @@ class PlannerComparison:
         print("所有分析图表生成完成！")
 
 if __name__ == "__main__":
-    output_dir = os.path.expanduser("/root/lio_ws/src/planner_comparison/results")
-    analyzer = PlannerComparison(output_dir)
-    analyzer.generate_all() 
+    from pathlib import Path
+
+    output_dir = Path(__file__).resolve().parents[1] / "results"
+    analyzer = PlannerComparison(str(output_dir))
+    analyzer.generate_all()

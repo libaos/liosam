@@ -228,10 +228,14 @@ class ReportGenerator:
         print(f"报告已成功生成: {self.output_file}")
 
 if __name__ == "__main__":
+    from pathlib import Path
+
+    tool_root = Path(__file__).resolve().parents[1]
+
     parser = argparse.ArgumentParser(description='生成PSOLQR与TEB对比报告')
-    parser.add_argument('--results_dir', type=str, default='/root/lio_ws/src/planner_comparison/results',
+    parser.add_argument('--results_dir', type=str, default=str(tool_root / "results"),
                         help='结果文件目录')
-    parser.add_argument('--output', type=str, default='/root/lio_ws/src/planner_comparison/report.pdf',
+    parser.add_argument('--output', type=str, default=str(tool_root / "report.pdf"),
                         help='输出PDF文件路径')
     
     args = parser.parse_args()

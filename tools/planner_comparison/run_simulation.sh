@@ -3,7 +3,7 @@
 # 坡道模拟和报告生成脚本
 
 # 设置工作目录
-WORK_DIR="/root/lio_ws/src/planner_comparison"
+WORK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RESULTS_DIR="$WORK_DIR/results"
 SCRIPTS_DIR="$WORK_DIR/scripts"
 

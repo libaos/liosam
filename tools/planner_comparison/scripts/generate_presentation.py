@@ -284,8 +284,11 @@ class PresentationGenerator:
         print(f"演示文档已生成：{pdf_path}")
 
 if __name__ == "__main__":
-    results_dir = os.path.expanduser("/root/lio_ws/src/planner_comparison/results")
-    output_dir = os.path.expanduser("/root/lio_ws/src/planner_comparison/presentation")
-    
-    generator = PresentationGenerator(results_dir, output_dir)
-    generator.generate_presentation() 
+    from pathlib import Path
+
+    tool_root = Path(__file__).resolve().parents[1]
+    results_dir = tool_root / "results"
+    output_dir = tool_root / "presentation"
+
+    generator = PresentationGenerator(str(results_dir), str(output_dir))
+    generator.generate_presentation()

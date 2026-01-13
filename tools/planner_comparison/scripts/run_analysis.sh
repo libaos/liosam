@@ -13,9 +13,10 @@ echo "此工具将生成理论对比数据和演示文档，不会修改任何�
 echo
 
 # 检查目录结构
-SCRIPT_DIR=/root/lio_ws/src/planner_comparison/scripts
-RESULTS_DIR=/root/lio_ws/src/planner_comparison/results
-PRESENTATION_DIR=/root/lio_ws/src/planner_comparison/presentation
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORK_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+RESULTS_DIR="${WORK_DIR}/results"
+PRESENTATION_DIR="${WORK_DIR}/presentation"
 
 # 确保目录存在
 mkdir -p $RESULTS_DIR
