@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Quick Start / docs
+    url: https://github.com/libaos/liosam#quick-start-3-min
+    about: Start here if you're new to the repo.

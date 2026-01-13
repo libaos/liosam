@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Python syntax check (compileall)
+        run: python -m compileall -q src tools
+
+      - name: Basic repository checks
+        run: |
+          test -f README.md
+          test -f ROADMAP.md
+          test -f CHANGELOG.md
+          test -f LICENSES.md

@@ -45,6 +45,7 @@ __pycache__/
 /.cache/
 /.cursor/
 /.mpl/
+/.github/chatmodes/
 /.conda/
 /.mamba/
 /.miniforge3/
