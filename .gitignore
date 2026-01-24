@@ -19,6 +19,11 @@
 *.bag
 *.bag.active
 *.db3
+*.deb
+*.tar.gz
+*.tgz
+*.zip
+*.7z
 
 # Point cloud / map outputs
 *.pcd
@@ -58,6 +63,10 @@ __pycache__/
 /.gazebo/
 /.ignition/
 
+# Local config (machine-specific)
+/.condarc
+/.rviz/
+
 # Extra build/test workspaces
 /build_teb_tests/
 /devel_teb_tests/
@@ -66,6 +75,7 @@ __pycache__/
 # Local outputs in repo root
 /map*.bin
 /trace_nvidia_smi.txt
+/*.svg
 
 # Local backups created during repo cleanup
 .git_backup_*
@@ -74,11 +84,18 @@ __pycache__/
 /rosbags/
 /trajectory_data/
 /teb_trajectory_data/
+/output/
+/结果/
+/backups/
 
 # Large third-party / local copies (keep sources elsewhere if needed)
 /gtsam-4.0.3/
 /small_gicp/
 /+autoware_vision_dartknet
+/third_party/loop_closure_2dcnn_scancontext_final/data/
+/third_party/loop_closure_2dcnn_scancontext_final/outputs/
+/third_party/loop_closure_2dcnn_scancontext_final/models/saved/
+/third_party/loop_closure_2dcnn_scancontext_final/location_database_3d.pkl
 
 # Misc workspace folders/files to omit
 /.spec-workflow/
@@ -88,6 +105,9 @@ __pycache__/
 /visualize_all_trajectories.py
 /visualize_multiple_trajectories.py
 /visualize_trajectory.launch
+/conda_envs/
+/miniforge3/
+/tools/ros_py39/
 
 # Personal notes / misc in this workspace
 /学习/

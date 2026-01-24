@@ -18,7 +18,7 @@ include_directories(${catkin_INCLUDE_DIRS})
 catkin_install_python(
   PROGRAMS
     scripts/fruit_tree_tracker_node.py
+    scripts/tree_row_fit_node.py
   DESTINATION
     ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-

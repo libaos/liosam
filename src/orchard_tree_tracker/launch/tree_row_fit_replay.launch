@@ -1,0 +1,27 @@
+<launch>
+  <!-- One-command bag replay + tree_row_fit (for validation). -->
+
+  <!-- Bag -->
+  <arg name="bag" default="/mysda/w/w/lio_ws/rosbags/tree_cloud_full_fast_20251228_172644.bag" />
+  <!-- Delay a bit so the node can initialize/sub before playback starts. -->
+  <arg name="bag_args" default="--clock --delay 1.0" />
+
+  <!-- Node topics -->
+  <arg name="input_topic" default="/orchard_segmentation/tree_cloud" />
+  <arg name="label_field" default="label" />
+  <arg name="row_fit_json_topic" default="/tree_row_fit_json" />
+
+  <!-- Use /clock from bag -->
+  <param name="/use_sim_time" value="true" />
+
+  <!-- Play bag inside roslaunch (no extra terminal needed). -->
+  <node pkg="rosbag" type="play" name="bag_play" output="screen" required="true"
+        args="$(arg bag_args) $(arg bag)" />
+
+  <include file="$(find orchard_tree_tracker)/launch/tree_row_fit.launch">
+    <arg name="input_topic" value="$(arg input_topic)" />
+    <arg name="label_field" value="$(arg label_field)" />
+    <arg name="row_fit_json_topic" value="$(arg row_fit_json_topic)" />
+  </include>
+</launch>
+

@@ -20,6 +20,9 @@
   <arg name="bev_height_px" default="0" />
   <arg name="export_draw_ids" default="true" />
   <arg name="export_draw_crowns" default="true" />
+  <arg name="export_draw_rows" default="true" />
+  <!-- White background (paper-style). Default false keeps legacy dark theme. -->
+  <arg name="export_white_bg" default="false" />
 
   <!-- Row fit -->
   <arg name="row_fit_min_points" default="3" />
@@ -29,6 +32,10 @@
   <arg name="row_fit_history_frames" default="20" />
   <!-- Filter for row fit only (does not change ~json_out/CSV); 0 disables filtering -->
   <arg name="row_fit_min_conf" default="0.0" />
+  <!-- Optional: enforce left/right rows parallel (common direction) to avoid crossing lines -->
+  <arg name="row_fit_parallel" default="false" />
+  <!-- Optional: if a side is missing, keep last valid line segment -->
+  <arg name="row_fit_hold_last" default="true" />
   <!-- Optional: motion-compensated row fit via TF (e.g. map/odom_est). Empty disables. -->
   <arg name="row_fit_fixed_frame" default="" />
   <arg name="row_fit_fixed_frame_timeout" default="0.05" />
@@ -45,6 +52,7 @@
   <arg name="voxel_size" default="0.03" />
   <arg name="cell_size" default="0.10" />
   <arg name="grid_T" default="5" />
+  <arg name="min_instance_points" default="0" />
 
   <!-- MOT -->
   <arg name="gate_distance" default="0.30" />
@@ -53,8 +61,9 @@
   <!-- Fit -->
   <arg name="K" default="20" />
   <arg name="ema_alpha" default="0.4" />
+  <arg name="python_exec" default="$(optenv ROS_PYTHON_EXEC /mysda/w/w/lio_ws/conda_envs/randla39/bin/python3)" />
 
-  <node pkg="orchard_tree_tracker" type="fruit_tree_tracker_node.py" name="fruit_tree_tracker" output="screen">
+  <node pkg="orchard_tree_tracker" type="fruit_tree_tracker_node.py" name="fruit_tree_tracker" output="screen" launch-prefix="$(arg python_exec)">
     <param name="input_topic" value="$(arg input_topic)" />
     <param name="label_field" value="$(arg label_field)" />
     <param name="markers" value="$(arg markers_topic)" />
@@ -73,12 +82,16 @@
     <param name="bev_height_px" value="$(arg bev_height_px)" />
     <param name="export_draw_ids" value="$(arg export_draw_ids)" />
     <param name="export_draw_crowns" value="$(arg export_draw_crowns)" />
+    <param name="export_draw_rows" value="$(arg export_draw_rows)" />
+    <param name="export_white_bg" value="$(arg export_white_bg)" />
 
     <param name="row_fit_min_points" value="$(arg row_fit_min_points)" />
     <param name="row_fit_inlier_dist" value="$(arg row_fit_inlier_dist)" />
     <param name="row_fit_iters" value="$(arg row_fit_iters)" />
     <param name="row_fit_history_frames" value="$(arg row_fit_history_frames)" />
     <param name="row_fit_min_conf" value="$(arg row_fit_min_conf)" />
+    <param name="row_fit_parallel" value="$(arg row_fit_parallel)" />
+    <param name="row_fit_hold_last" value="$(arg row_fit_hold_last)" />
     <param name="row_fit_fixed_frame" value="$(arg row_fit_fixed_frame)" />
     <param name="row_fit_fixed_frame_timeout" value="$(arg row_fit_fixed_frame_timeout)" />
 
@@ -92,6 +105,7 @@
     <param name="voxel_size" value="$(arg voxel_size)" />
     <param name="cell_size" value="$(arg cell_size)" />
     <param name="grid_T" value="$(arg grid_T)" />
+    <param name="min_instance_points" value="$(arg min_instance_points)" />
 
     <param name="gate_distance" value="$(arg gate_distance)" />
     <param name="max_missed" value="$(arg max_missed)" />

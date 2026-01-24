@@ -4,7 +4,11 @@
 from __future__ import annotations
 
 import math
+import threading
 from typing import List, Optional, Tuple
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 
 import rospy
 from geometry_msgs.msg import Twist
@@ -29,6 +33,8 @@ class PidFollower:
         self.path: List[Tuple[float, float]] = []
         self.goal: Optional[Tuple[float, float]] = None
         self.odom: Optional[Odometry] = None
+        self._nearest_idx: Optional[int] = None
+        self._path_signature: Optional[Tuple[int, Tuple[float, float], Tuple[float, float]]] = None
 
         self.kp = float(rospy.get_param("~kp", 1.6))
         self.ki = float(rospy.get_param("~ki", 0.0))
@@ -42,6 +48,12 @@ class PidFollower:
         self.k_dist = float(rospy.get_param("~k_dist", 0.8))
         self.goal_tolerance = float(rospy.get_param("~goal_tolerance", 0.4))
         self.stop_at_goal = bool(int(rospy.get_param("~stop_at_goal", 1)))
+
+        # When the path crosses itself (e.g. figure-8), a "global nearest" target can jump to a
+        # different segment and cause the robot to loop forever. Keep the nearest search within a
+        # sliding window around the last matched index to enforce forward progress.
+        self.search_back_points = int(rospy.get_param("~search_back_points", 10))
+        self.search_ahead_points = int(rospy.get_param("~search_ahead_points", 25))
 
         self.prev_err = 0.0
         self.err_i = 0.0
@@ -58,12 +70,34 @@ class PidFollower:
 
         self.timer = rospy.Timer(rospy.Duration(0.05), self._on_timer)
 
+    def _is_same_path(self, pts: List[Tuple[float, float]]) -> bool:
+        if not pts:
+            return False
+        sig = (len(pts), pts[0], pts[-1])
+        if self._path_signature is None:
+            return False
+        if sig != self._path_signature:
+            return False
+        # Signature matches; confirm full equality with a small tolerance to avoid
+        # unnecessary progress resets when the same latched path is re-published.
+        if len(pts) != len(self.path):
+            return False
+        tol = 1.0e-6
+        for (x0, y0), (x1, y1) in zip(pts, self.path):
+            if abs(x0 - x1) > tol or abs(y0 - y1) > tol:
+                return False
+        return True
+
     def _path_cb(self, msg: Path) -> None:
         pts = [(float(p.pose.position.x), float(p.pose.position.y)) for p in msg.poses]
         if pts:
+            if self._is_same_path(pts):
+                return
             self.path = pts
             self.goal = pts[-1]
             self.reached = False
+            self._nearest_idx = None
+            self._path_signature = (len(pts), pts[0], pts[-1])
 
     def _odom_cb(self, msg: Odometry) -> None:
         self.odom = msg
@@ -71,17 +105,27 @@ class PidFollower:
     def _pick_target(self, x: float, y: float) -> Tuple[float, float, float]:
         if not self.path:
             return x, y, 0.0
-        # Find nearest point (small path, so full scan is OK)
-        nearest_idx = 0
+
+        search_back = max(0, int(self.search_back_points))
+        search_ahead = max(1, int(self.search_ahead_points))
+        start_idx = 0
+        end_idx = len(self.path)
+        if self._nearest_idx is not None:
+            start_idx = max(0, int(self._nearest_idx) - search_back)
+            end_idx = min(len(self.path), int(self._nearest_idx) + search_ahead + 1)
+
+        nearest_idx = start_idx
         nearest_d = float("inf")
-        for i, (px, py) in enumerate(self.path):
+        for i in range(start_idx, end_idx):
+            px, py = self.path[i]
             d = math.hypot(px - x, py - y)
             if d < nearest_d:
                 nearest_d = d
                 nearest_idx = i
+        self._nearest_idx = nearest_idx
 
         target_idx = nearest_idx
-        for j in range(nearest_idx, len(self.path)):
+        for j in range(nearest_idx, min(len(self.path), nearest_idx + search_ahead + 1)):
             if math.hypot(self.path[j][0] - x, self.path[j][1] - y) >= self.lookahead:
                 target_idx = j
                 break
@@ -91,7 +135,11 @@ class PidFollower:
         return tx, ty, heading
 
     def _on_timer(self, _evt) -> None:
-        if self.odom is None or not self.path or self.reached:
+        if self.odom is None or not self.path:
+            return
+        if self.reached:
+            cmd = Twist()
+            self.cmd_pub.publish(cmd)
             return
 
         pose = self.odom.pose.pose

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This small script subscribes to the FeedbackMsg message of teb_local_planner
 # and plots the current velocity.
@@ -6,6 +6,10 @@
 # Author: christoph.roesmann@tu-dortmund.de
 
 import rospy, math
+import threading
+
+if not hasattr(threading.Thread, "isAlive"):
+  setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 from teb_local_planner.msg import FeedbackMsg, TrajectoryMsg, TrajectoryPointMsg
 from geometry_msgs.msg import PolygonStamped, Point32
 import numpy as np
@@ -73,4 +77,3 @@ if __name__ == '__main__':
     velocity_plotter()
   except rospy.ROSInterruptException:
     pass
-

@@ -1,0 +1,42 @@
+path_topic: "/corridor_centerline"
+quality_topic: "/corridor_quality"
+clearance_topic: "/corridor_clearance_min"
+route_id_topic: "/route_id_stable"
+route_valid_topic: "/route_id_valid"
+
+cmd_vel_topic: "/cmd_vel"
+markers_topic: "/corridor_controller_markers"
+default_frame: "base_link_est"
+
+enabled: false
+publish_rate: 20.0
+max_path_age: 0.5
+
+require_quality: false
+max_quality_age: 1.0
+require_clearance: false
+max_clearance_age: 1.0
+require_route_valid: false
+max_route_age: 1.0
+
+enable_ramp_time: 0.5
+disable_brake_pulses: 5
+
+lookahead: 0.8
+min_target_x: 0.15
+min_points: 3
+
+k_pursuit: 1.0
+v_max: 0.35
+max_omega: 0.8
+
+q_stop: 0.3
+q_full: 0.8
+v_low_q: 0.0
+
+clearance_stop: 0.25
+clearance_full: 0.6
+
+marker_z: 0.15
+marker_lifetime: 0.2
+log_interval: 2.0

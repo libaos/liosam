@@ -1,0 +1,72 @@
+<launch>
+  <!-- Tree row boundary fitting only (publishes /tree_row_fit_json). -->
+
+  <!-- Topics -->
+  <arg name="input_topic" default="/segmented_points" />
+  <arg name="label_field" default="label" />
+  <arg name="row_fit_json_topic" default="/tree_row_fit_json" />
+
+  <!-- ROI -->
+  <arg name="roi_x_min" default="0.0" />
+  <arg name="roi_x_max" default="10.0" />
+  <arg name="roi_y_min" default="-4.0" />
+  <arg name="roi_y_max" default="4.0" />
+  <arg name="roi_z_min" default="-0.5" />
+  <arg name="roi_z_max" default="2.5" />
+
+  <!-- Preprocess / Instancing -->
+  <arg name="voxel_size" default="0.03" />
+  <arg name="cell_size" default="0.10" />
+  <arg name="grid_T" default="5" />
+  <!-- Only keep clusters with at least this many points (after voxel+ROI). -->
+  <arg name="instance_min_points" default="6" />
+  <!-- Merge close-by clusters (meters) before history/fitting. -->
+  <arg name="instance_merge_distance" default="0.35" />
+
+  <!-- Row fit -->
+  <arg name="row_fit_history_frames" default="20" />
+  <arg name="row_fit_inlier_dist" default="0.20" />
+  <arg name="row_fit_min_points" default="3" />
+  <arg name="row_fit_iters" default="2" />
+  <!-- EMA smoothing for p0 + direction (0=no update, 1=no smoothing). -->
+  <arg name="row_fit_ema_alpha" default="0.30" />
+  <!-- Hold-last max frames when a side has too few points (0=infinite). -->
+  <arg name="row_fit_hold_max_frames" default="15" />
+
+  <!-- Optional: motion-compensated history via TF -->
+  <arg name="row_fit_fixed_frame" default="" />
+  <arg name="row_fit_fixed_frame_timeout" default="0.05" />
+  <!-- Reset history if yaw jumps too much (deg). 0 disables. -->
+  <arg name="row_fit_reset_yaw_deg" default="30.0" />
+  <arg name="python_exec" default="$(optenv ROS_PYTHON_EXEC /mysda/w/w/lio_ws/conda_envs/randla39/bin/python3)" />
+
+  <node pkg="orchard_tree_tracker" type="tree_row_fit_node.py" name="tree_row_fit" output="screen" launch-prefix="$(arg python_exec)">
+    <param name="input_topic" value="$(arg input_topic)" />
+    <param name="label_field" value="$(arg label_field)" />
+    <param name="row_fit_json" value="$(arg row_fit_json_topic)" />
+
+    <param name="roi_x_min" value="$(arg roi_x_min)" />
+    <param name="roi_x_max" value="$(arg roi_x_max)" />
+    <param name="roi_y_min" value="$(arg roi_y_min)" />
+    <param name="roi_y_max" value="$(arg roi_y_max)" />
+    <param name="roi_z_min" value="$(arg roi_z_min)" />
+    <param name="roi_z_max" value="$(arg roi_z_max)" />
+
+    <param name="voxel_size" value="$(arg voxel_size)" />
+    <param name="cell_size" value="$(arg cell_size)" />
+    <param name="grid_T" value="$(arg grid_T)" />
+    <param name="instance_min_points" value="$(arg instance_min_points)" />
+    <param name="instance_merge_distance" value="$(arg instance_merge_distance)" />
+
+    <param name="row_fit_history_frames" value="$(arg row_fit_history_frames)" />
+    <param name="row_fit_inlier_dist" value="$(arg row_fit_inlier_dist)" />
+    <param name="row_fit_min_points" value="$(arg row_fit_min_points)" />
+    <param name="row_fit_iters" value="$(arg row_fit_iters)" />
+    <param name="row_fit_ema_alpha" value="$(arg row_fit_ema_alpha)" />
+    <param name="row_fit_hold_max_frames" value="$(arg row_fit_hold_max_frames)" />
+
+    <param name="row_fit_fixed_frame" value="$(arg row_fit_fixed_frame)" />
+    <param name="row_fit_fixed_frame_timeout" value="$(arg row_fit_fixed_frame_timeout)" />
+    <param name="row_fit_reset_yaw_deg" value="$(arg row_fit_reset_yaw_deg)" />
+  </node>
+</launch>

@@ -25,6 +25,8 @@
     <xacro:property name="organize_cloud" value="$(arg organize_cloud)" />
     <xacro:arg name="lidar_hz" default="10"/>
     <xacro:arg name="lidar_samples" default="440"/>
+    <xacro:arg name="use_skid_steer" default="false"/>
+    <xacro:arg name="use_planar_move" default="true"/>
 
     <material name="black">
         <color rgba="0.0 0.0 0.0 1.0" />
@@ -39,6 +41,8 @@
 
     <!-- VLP16 激光雷达 -->
     <xacro:include filename="$(find scout_gazebo)/urdf/laser_support.xacro" />
+    <xacro:property name="lidar_x" value="${support_x_size}" />
+    <xacro:property name="lidar_z" value="${support_z_size + support_length/2}" />
     <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro"/>
     <xacro:VLP-16 parent="support" name="velodyne" topic="/velodyne_points" organize_cloud="${organize_cloud}" hz="$(arg lidar_hz)" samples="$(arg lidar_samples)" gpu="${gpu}">
           <origin xyz="0 0 ${support_length/2}" rpy="0 0 0" />

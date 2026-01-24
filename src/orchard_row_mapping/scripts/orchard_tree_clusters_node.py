@@ -11,12 +11,17 @@ from __future__ import annotations
 
 import json
 import math
+import threading
 from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
+
 import rospy
 import tf2_ros
 from geometry_msgs.msg import Point

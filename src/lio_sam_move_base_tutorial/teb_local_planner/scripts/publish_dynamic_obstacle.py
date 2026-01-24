@@ -1,8 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Author: franz.albers@tu-dortmund.de
 
 import rospy, math, tf
+import threading
+
+if not hasattr(threading.Thread, "isAlive"):
+  setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 from costmap_converter.msg import ObstacleArrayMsg, ObstacleMsg
 from geometry_msgs.msg import PolygonStamped, Point32, QuaternionStamped, Quaternion, TwistWithCovariance
 from tf.transformations import quaternion_from_euler
@@ -64,4 +68,3 @@ if __name__ == '__main__':
     publish_obstacle_msg()
   except rospy.ROSInterruptException:
     pass
-

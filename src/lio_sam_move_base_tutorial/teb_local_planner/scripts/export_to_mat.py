@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This small script subscribes to the FeedbackMsg message of teb_local_planner
 # and exports data to a mat file.
@@ -6,6 +6,10 @@
 # Author: christoph.roesmann@tu-dortmund.de
 
 import rospy, math
+import threading
+
+if not hasattr(threading.Thread, "isAlive"):
+  setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 from teb_local_planner.msg import FeedbackMsg, TrajectoryMsg, TrajectoryPointMsg
 from geometry_msgs.msg import PolygonStamped, Point32, Quaternion
 from tf.transformations import euler_from_quaternion
@@ -109,4 +113,3 @@ if __name__ == '__main__':
     feedback_exporter()
   except rospy.ROSInterruptException:
     pass
-

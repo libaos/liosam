@@ -1,0 +1,18 @@
+input_occ_topic: "/bev_occ"
+input_centerline_topic: "/corridor_centerline"
+markers_topic: "/corridor_boundary_markers"
+width_topic: "/corridor_width"
+
+occ_threshold: 50
+unknown_as_obstacle: true
+max_scan_distance: 6.0
+scan_step: 0.05
+sample_stride: 1
+width_mode: "min"  # min | mean
+max_age: 0.0
+
+line_width: 0.05
+point_size: 0.08
+marker_z: 0.05
+marker_lifetime: 0.2
+log_interval: 2.0

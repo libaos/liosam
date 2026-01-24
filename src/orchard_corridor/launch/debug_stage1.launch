@@ -1,0 +1,69 @@
+<launch>
+  <arg name="points_topic" default="/points_raw" />
+  <arg name="tree_points_topic" default="/tree_points" />
+  <arg name="bev_occ_topic" default="/bev_occ" />
+  <arg name="output_frame" default="base_link_est" />
+  <arg name="use_tf" default="true" />
+  <arg name="preprocess_config" default="$(find orchard_corridor)/config/pointcloud_preprocess.yaml" />
+  <arg name="bev_config" default="$(find orchard_corridor)/config/bev_occupancy.yaml" />
+  <arg name="use_randla" default="true" />
+  <arg name="randla_config" default="$(find orchard_row_mapping)/config/liorl_tree_map.yaml" />
+  <arg name="randla_env_prefix" default="$(optenv RANDLA_ENV_PREFIX /mysda/w/w/lio_ws/conda_envs/randla39)" />
+  <arg name="randla_pythonpath" default="$(arg randla_env_prefix)/lib/python3.9/site-packages" />
+  <arg name="randla_ld_library_path" default="$(arg randla_env_prefix)/lib" />
+  <arg name="randla_path" default="$(arg randla_env_prefix)/bin" />
+  <arg name="randla_python_exec" default="$(arg randla_path)/python3" />
+  <!-- Use ROS_PYTHON_EXEC if set, otherwise fallback to RandLA env python. -->
+  <arg name="python_exec" default="$(eval optenv('ROS_PYTHON_EXEC', arg('randla_python_exec')))" />
+  <arg name="ros_ld_library_path" default="/mysda/w/w/lio_ws/devel/lib:/opt/ros/noetic/lib" />
+  <arg name="use_gpu" default="true" />
+  <arg name="publish_base_link_alias" default="true" />
+  <arg name="base_link_alias_parent" default="base_link_est" />
+  <arg name="base_link_alias_child" default="base_link" />
+  <arg name="output_dir" default="/mysda/w/w/lio_ws/output/debug_stage1" />
+  <arg name="launch_rviz" default="false" />
+  <arg name="rviz_config" default="$(find orchard_corridor)/rviz/debug_stage1.rviz" />
+
+  <node pkg="orchard_corridor" type="pointcloud_preprocess_node.py" name="pointcloud_preprocess" output="screen" launch-prefix="$(arg python_exec)">
+    <rosparam command="load" file="$(arg preprocess_config)" />
+    <param name="input_topic" value="$(arg points_topic)" />
+    <param name="output_frame" value="$(arg output_frame)" />
+    <param name="use_tf" value="$(arg use_tf)" />
+  </node>
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_alias_tf"
+        args="0 0 0 0 0 0 $(arg base_link_alias_parent) $(arg base_link_alias_child)"
+        if="$(arg publish_base_link_alias)" />
+
+  <group if="$(arg use_randla)">
+    <node pkg="orchard_row_mapping" type="orchard_segmentation_node.py" name="orchard_segmentation" output="screen" launch-prefix="$(arg randla_python_exec)">
+      <env name="PATH" value="$(arg randla_path):$(optenv PATH)" />
+      <env name="PYTHONPATH" value="$(arg randla_pythonpath):$(optenv PYTHONPATH)" />
+      <env name="LD_LIBRARY_PATH" value="$(arg randla_ld_library_path):$(arg ros_ld_library_path)" />
+      <rosparam command="load" file="$(arg randla_config)" />
+      <param name="pointcloud_topic" value="/pc_roi" />
+      <param name="output_frame" value="$(arg output_frame)" />
+      <param name="use_gpu" value="$(arg use_gpu)" />
+      <param name="publish_tree_cloud" value="true" />
+      <param name="publish_segmented_cloud" value="false" />
+      <param name="publish_row_markers" value="false" />
+      <remap from="~tree_cloud" to="$(arg tree_points_topic)" />
+    </node>
+  </group>
+
+  <node pkg="orchard_corridor" type="bev_occupancy_node.py" name="bev_occupancy" output="screen" launch-prefix="$(arg python_exec)">
+    <rosparam command="load" file="$(arg bev_config)" />
+    <param name="input_topic" value="$(arg tree_points_topic)" />
+    <param name="output_frame" value="$(arg output_frame)" />
+    <param name="use_tf" value="$(arg use_tf)" />
+  </node>
+
+  <node pkg="orchard_corridor" type="debug_export_node.py" name="debug_export" output="screen" launch-prefix="$(arg python_exec)">
+    <rosparam command="load" file="$(find orchard_corridor)/config/debug_export.yaml" />
+    <param name="tree_points_topic" value="$(arg tree_points_topic)" />
+    <param name="bev_occ_topic" value="$(arg bev_occ_topic)" />
+    <param name="output_dir" value="$(arg output_dir)" />
+  </node>
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_config)" if="$(arg launch_rviz)" />
+</launch>

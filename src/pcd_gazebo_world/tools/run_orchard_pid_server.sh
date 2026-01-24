@@ -7,6 +7,10 @@ WS_DIR="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 PORT="${1:-11347}"
 DEFAULT_PATH_JSON="${WS_DIR}/src/pcd_gazebo_world/maps/runs/rosbag_path.json"
 DEFAULT_WORLD_FILE="${WS_DIR}/src/pcd_gazebo_world/worlds/orchard_from_pcd_validated_by_bag.world"
+LIDAR_HZ="${LIDAR_HZ:-10}"
+LIDAR_SAMPLES="${LIDAR_SAMPLES:-440}"
+USE_SKID_STEER="${USE_SKID_STEER:-false}"
+USE_PLANAR_MOVE="${USE_PLANAR_MOVE:-true}"
 
 PATH_JSON="${2:-${DEFAULT_PATH_JSON}}"
 WORLD_FILE="${3:-${DEFAULT_WORLD_FILE}}"
@@ -54,8 +58,8 @@ source "${WS_DIR}/devel/setup.bash"
 exec roslaunch pcd_gazebo_world orchard_pid_replay.launch \
   gui:=false \
   gazebo_master_uri:="${GAZEBO_MASTER_URI}" \
-  gpu:=false organize_cloud:=false lidar_hz:=2 lidar_samples:=60 \
-  use_skid_steer:=false use_planar_move:=true \
+  gpu:=false organize_cloud:=false lidar_hz:="${LIDAR_HZ}" lidar_samples:="${LIDAR_SAMPLES}" \
+  use_skid_steer:="${USE_SKID_STEER}" use_planar_move:="${USE_PLANAR_MOVE}" \
   world_name:="${WORLD_FILE}" \
   path_file:="${PATH_JSON}" \
   record_csv:="${RECORD_CSV}"

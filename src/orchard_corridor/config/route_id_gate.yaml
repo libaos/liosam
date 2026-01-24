@@ -1,0 +1,13 @@
+input_id_topic: "/route_id"
+input_conf_topic: "/route_conf"
+output_id_topic: "/route_id_stable"
+output_valid_topic: "/route_id_valid"
+
+conf_th: 0.6
+stable_N: 3
+timeout: 2.0
+allowed_jump: 1
+publish_rate: 10.0
+max_age: 1.0
+unknown_id: -1
+log_interval: 2.0

@@ -14,6 +14,8 @@
 
 > 目标：第一次进来 3 分钟跑起来（前提：你本机已装好 ROS）。
 
+快速找入口（中文速查）：`docs/目录索引.md`
+
 ## Table of Contents
 
 - [Quick Start (3 min)](#quick-start-3-min)
@@ -119,6 +121,7 @@ rviz -d "$(rospack find scout_gazebo)/config/show_robot.rviz"
 - ROS: Noetic (ROS1)
 - Gazebo: Classic 11（随 `desktop-full`）
 - Python: 3.8+
+- Conda（可选，用于 Torch/RandLA 等 Python 依赖）：见 `docs/conda_env.md`
 
 ### Verified versions
 

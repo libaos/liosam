@@ -1,0 +1,26 @@
+<launch>
+  <arg name="cloud_topic" default="/points_raw" />
+  <arg name="route_id_topic" default="/route_id" />
+  <arg name="route_conf_topic" default="/route_conf" />
+  <arg name="use_gpu" default="true" />
+  <arg name="process_hz" default="2.0" />
+
+  <arg name="env_prefix" default="$(optenv RANDLA_ENV_PREFIX /mysda/w/w/lio_ws/conda_envs/randla39)" />
+  <arg name="env_pythonpath" default="$(arg env_prefix)/lib/python3.9/site-packages" />
+  <arg name="env_ld_library_path" default="$(arg env_prefix)/lib" />
+  <arg name="env_path" default="$(arg env_prefix)/bin" />
+  <!-- Use ROS_PYTHON_EXEC if set, otherwise fallback to env python. -->
+  <arg name="python_exec" default="$(eval optenv('ROS_PYTHON_EXEC', arg('env_path') + '/python3'))" />
+
+  <node pkg="orchard_nn_scancontext" type="nn_scancontext_node.py" name="nn_scancontext" output="screen" launch-prefix="$(arg python_exec)">
+    <env name="PATH" value="$(arg env_path):$(optenv PATH)" />
+    <env name="PYTHONPATH" value="$(arg env_pythonpath):$(optenv PYTHONPATH)" />
+    <env name="LD_LIBRARY_PATH" value="$(arg env_ld_library_path):$(optenv LD_LIBRARY_PATH)" />
+
+    <param name="cloud_topic" value="$(arg cloud_topic)" />
+    <param name="route_id_topic" value="$(arg route_id_topic)" />
+    <param name="route_conf_topic" value="$(arg route_conf_topic)" />
+    <param name="use_gpu" value="$(arg use_gpu)" />
+    <param name="process_hz" value="$(arg process_hz)" />
+  </node>
+</launch>

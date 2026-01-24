@@ -151,6 +151,11 @@ def main() -> int:
     parser.add_argument("--bag", required=True, type=str)
     parser.add_argument("--points-topic", default="/points_raw", type=str)
     parser.add_argument("--out-dir", default="", type=str)
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Resume into an existing out-dir by appending to frames.csv and continuing file indices.",
+    )
     parser.add_argument("--every", type=int, default=1, help="Process every Nth frame.")
     parser.add_argument("--max-frames", type=int, default=0)
     parser.add_argument("--start-offset", type=float, default=0.0)
@@ -195,12 +200,30 @@ def main() -> int:
     out_dir = Path(args.out_dir).expanduser().resolve() if str(args.out_dir).strip() else (
         Path(__file__).resolve().parents[3] / "maps" / f"seg_tree_frames_{time.strftime('%Y%m%d_%H%M%S')}"
     )
+    if args.resume and not out_dir.is_dir():
+        raise FileNotFoundError(f"--resume requested but out-dir does not exist: {out_dir}")
     pcd_dir = out_dir / "pcd"
     png_dir = out_dir / "png"
     pcd_dir.mkdir(parents=True, exist_ok=True)
     if args.save_png:
         png_dir.mkdir(parents=True, exist_ok=True)
         os.environ.setdefault("MPLCONFIGDIR", str(out_dir / ".mplcache"))
+
+    csv_path = out_dir / "frames.csv"
+    resume_index = 0
+    if args.resume and csv_path.is_file():
+        last_index = None
+        with csv_path.open("r", newline="") as handle:
+            reader = csv.reader(handle)
+            _header = next(reader, None)
+            for row in reader:
+                if not row:
+                    continue
+                try:
+                    last_index = int(str(row[0]).strip())
+                except Exception:
+                    continue
+        resume_index = int(last_index) + 1 if last_index is not None else 0
 
     if args.torch_threads > 0:
         torch.set_num_threads(int(args.torch_threads))
@@ -221,12 +244,14 @@ def main() -> int:
     start_time = bag_start + float(args.start_offset)
     end_time = bag_end if float(args.duration) <= 0.0 else start_time + float(args.duration)
 
-    csv_path = out_dir / "frames.csv"
-    with csv_path.open("w", newline="") as handle:
+    csv_mode = "a" if resume_index > 0 else "w"
+    with csv_path.open(csv_mode, newline="") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["index", "t_sec", "points_tree", "pcd_path", "png_path"])
+        if csv_mode == "w":
+            writer.writerow(["index", "t_sec", "points_tree", "pcd_path", "png_path"])
 
-        processed = 0
+        processed = int(resume_index)
+        skipped = 0
         msg_idx = 0
         with rosbag.Bag(str(bag_path)) as bag:
             for _topic, msg, t in bag.read_messages(topics=[args.points_topic]):
@@ -241,6 +266,10 @@ def main() -> int:
 
                 points_xyz = _cloud_to_xyz(msg)
                 if points_xyz.size == 0:
+                    continue
+
+                if int(resume_index) > 0 and skipped < int(resume_index):
+                    skipped += 1
                     continue
 
                 seed = None if int(args.sampling_seed) < 0 else int(args.sampling_seed) + processed

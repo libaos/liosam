@@ -19,15 +19,17 @@
   <arg name="record" default="false" />
   <arg name="out_bag" default="" />
   <arg name="record_topics" default="/fsm/mode /liorl/mapping/path" />
+  <arg name="python_exec" default="$(optenv ROS_PYTHON_EXEC /mysda/w/w/lio_ws/conda_envs/randla39/bin/python3)" />
 
   <param name="/use_sim_time" value="true" />
 
   <include if="$(arg enable_orchard_segmentation)" file="$(find orchard_row_mapping)/launch/orchard_row_liorl_pretty.launch">
     <arg name="config" value="$(arg orchard_config)" />
+    <arg name="python_exec" value="$(arg python_exec)" />
   </include>
 
   <node if="$(arg enable_tree_clustering)" pkg="orchard_row_mapping" type="orchard_tree_clusters_node.py"
-        name="orchard_tree_clusters" output="screen">
+        name="orchard_tree_clusters" output="screen" launch-prefix="$(arg python_exec)">
     <param name="input_topic" value="$(arg tree_cluster_input)" />
     <param name="process_hz" value="$(arg tree_cluster_process_hz)" />
     <param name="z_min" value="$(arg tree_cluster_z_min)" />
@@ -38,6 +40,7 @@
 
   <include file="$(find orchard_scancontext_fsm)/launch/scancontext_fsm.launch">
     <arg name="cloud_topic" value="$(arg cloud_topic)" />
+    <arg name="python_exec" value="$(arg python_exec)" />
   </include>
 
   <node if="$(arg record)" pkg="rosbag" type="record" name="ch5_record" output="screen"

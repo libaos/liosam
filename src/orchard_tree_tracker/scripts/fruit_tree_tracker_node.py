@@ -30,11 +30,15 @@ import math
 import struct
 import subprocess
 import sys
+import threading
 import zlib
 from collections import deque
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Deque, Dict, List, Optional, Sequence, Set, Tuple
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 
 import numpy as np
 
@@ -53,6 +57,7 @@ class RoiParams:
 class GridParams:
     cell_size: float = 0.10
     count_threshold: int = 5
+    min_instance_points: int = 0
 
 
 @dataclass(frozen=True)
@@ -205,6 +210,7 @@ def _grid_instances(points_xyz: np.ndarray, roi: RoiParams, grid: GridParams) ->
     if cell_size <= 0.0:
         raise ValueError("grid.cell_size must be > 0")
     threshold = max(1, int(grid.count_threshold))
+    min_instance_points = int(max(0, int(getattr(grid, "min_instance_points", 0))))
 
     x_min, x_max = float(roi.x_min), float(roi.x_max)
     y_min, y_max = float(roi.y_min), float(roi.y_max)
@@ -254,6 +260,8 @@ def _grid_instances(points_xyz: np.ndarray, roi: RoiParams, grid: GridParams) ->
             continue
         cluster_pts = pts_sorted[s:e]
         if cluster_pts.shape[0] == 0:
+            continue
+        if int(cluster_pts.shape[0]) < int(min_instance_points):
             continue
         cx = float(np.median(cluster_pts[:, 0]))
         cy = float(np.median(cluster_pts[:, 1]))
@@ -348,6 +356,114 @@ def fit_line_pca(
     return True, p0, v, stats
 
 
+def fit_line_fixed_direction(
+    points_xy: np.ndarray,
+    *,
+    v_dir: np.ndarray,
+    inlier_dist: float,
+    min_points: int,
+    iters: int,
+) -> Tuple[bool, np.ndarray, np.ndarray, Dict[str, float]]:
+    points_xy = np.asarray(points_xy, dtype=np.float32).reshape((-1, 2))
+    total = int(points_xy.shape[0])
+    stats: Dict[str, float] = {"total": float(total), "inliers": 0.0, "rms": 0.0}
+
+    v = np.asarray(v_dir, dtype=np.float32).reshape((2,))
+    n = float(np.linalg.norm(v))
+    if not (n > 1e-12):
+        return False, np.zeros((2,), dtype=np.float32), np.zeros((2,), dtype=np.float32), stats
+    v = (v / n).astype(np.float32, copy=False)
+    if float(v[0]) < 0.0 or (abs(float(v[0])) < 1e-12 and float(v[1]) < 0.0):
+        v = (-v).astype(np.float32, copy=False)
+
+    if total < int(max(2, min_points)):
+        return False, np.zeros((2,), dtype=np.float32), v, stats
+
+    inlier_dist = float(max(0.0, inlier_dist))
+    inlier2 = float(inlier_dist * inlier_dist)
+    nvec = np.array([-float(v[1]), float(v[0])], dtype=np.float32)
+
+    p0 = np.mean(points_xy, axis=0).astype(np.float32, copy=False)
+    mask = np.ones((total,), dtype=bool)
+    for _ in range(max(1, int(iters))):
+        w = points_xy - p0[None, :]
+        cross = (float(v[0]) * w[:, 1] - float(v[1]) * w[:, 0]).astype(np.float32, copy=False)
+        d2 = (cross * cross).astype(np.float32, copy=False)
+        new_mask = d2 <= float(inlier2)
+        inliers = int(np.count_nonzero(new_mask))
+        if inliers < int(min_points):
+            return False, p0, v, stats
+        if bool(np.array_equal(new_mask, mask)):
+            mask = new_mask
+            break
+        mask = new_mask
+        pts_in = points_xy[mask]
+        mu = np.mean(pts_in, axis=0).astype(np.float32, copy=False)
+        s = (float(nvec[0]) * pts_in[:, 0] + float(nvec[1]) * pts_in[:, 1]).astype(np.float32, copy=False)
+        s0 = float(np.median(s))
+        s_mu = float(nvec[0]) * float(mu[0]) + float(nvec[1]) * float(mu[1])
+        p0 = (mu + nvec * float(s0 - s_mu)).astype(np.float32, copy=False)
+
+    inliers = int(np.count_nonzero(mask))
+    stats["inliers"] = float(inliers)
+    if inliers < int(min_points):
+        return False, p0, v, stats
+
+    w_in = points_xy[mask] - p0[None, :]
+    cross_in = (float(v[0]) * w_in[:, 1] - float(v[1]) * w_in[:, 0]).astype(np.float32, copy=False)
+    rms = float(np.sqrt(float(np.mean((cross_in * cross_in).astype(np.float32, copy=False)))))
+    stats["rms"] = float(rms)
+    return True, p0, v, stats
+
+
+def kmeans_1d_2clusters(values: np.ndarray, *, iters: int = 10) -> Tuple[bool, np.ndarray, float, float]:
+    values = np.asarray(values, dtype=np.float32).reshape((-1,))
+    n = int(values.shape[0])
+    if n < 2:
+        return False, np.zeros((n,), dtype=bool), 0.0, 0.0
+
+    v_min = float(np.min(values))
+    v_max = float(np.max(values))
+    if not (math.isfinite(v_min) and math.isfinite(v_max)) or abs(v_max - v_min) < 1e-9:
+        return False, np.zeros((n,), dtype=bool), 0.0, 0.0
+
+    try:
+        c0 = float(np.percentile(values, 25.0))
+        c1 = float(np.percentile(values, 75.0))
+    except Exception:
+        c0 = float(v_min)
+        c1 = float(v_max)
+    if not (math.isfinite(c0) and math.isfinite(c1)) or abs(c1 - c0) < 1e-9:
+        c0 = float(v_min)
+        c1 = float(v_max)
+    if c0 > c1:
+        c0, c1 = c1, c0
+
+    mask = values <= float(np.median(values))
+    for _ in range(max(1, int(iters))):
+        d0 = (values - float(c0)) ** 2
+        d1 = (values - float(c1)) ** 2
+        new_mask = d0 <= d1
+        if bool(new_mask.all()) or bool((~new_mask).all()):
+            med = float(np.median(values))
+            new_mask = values <= med
+        if bool(new_mask.all()) or bool((~new_mask).all()):
+            break
+        if bool(np.array_equal(new_mask, mask)):
+            break
+        mask = new_mask
+        c0 = float(np.mean(values[mask]))
+        c1 = float(np.mean(values[~mask]))
+        if c0 > c1:
+            c0, c1 = c1, c0
+            mask = ~mask
+
+    if int(np.count_nonzero(mask)) == 0 or int(np.count_nonzero(~mask)) == 0:
+        return False, np.zeros((n,), dtype=bool), float(c0), float(c1)
+
+    return True, mask.astype(bool, copy=False), float(c0), float(c1)
+
+
 def clip_line_to_roi(p0: np.ndarray, v: np.ndarray, roi: RoiParams) -> Tuple[bool, np.ndarray, np.ndarray]:
     p0 = np.asarray(p0, dtype=np.float32).reshape((2,))
     v = np.asarray(v, dtype=np.float32).reshape((2,))
@@ -436,6 +552,10 @@ def _stable_rgb_from_id(tree_id: int) -> Tuple[int, int, int]:
 _FONT_5X7: Dict[str, Tuple[str, ...]] = {
     " ": ("00000", "00000", "00000", "00000", "00000", "00000", "00000"),
     ".": ("00000", "00000", "00000", "00000", "00000", "01100", "01100"),
+    "-": ("00000", "00000", "00000", "11111", "00000", "00000", "00000"),
+    "/": ("00001", "00010", "00100", "01000", "10000", "00000", "00000"),
+    ":": ("00000", "00100", "00100", "00000", "00100", "00100", "00000"),
+    "=": ("00000", "11111", "00000", "11111", "00000", "00000", "00000"),
     "_": ("00000", "00000", "00000", "00000", "00000", "00000", "11111"),
     "0": ("01110", "10001", "10011", "10101", "11001", "10001", "01110"),
     "1": ("00100", "01100", "00100", "00100", "00100", "00100", "01110"),
@@ -447,14 +567,19 @@ _FONT_5X7: Dict[str, Tuple[str, ...]] = {
     "7": ("11111", "00001", "00010", "00100", "01000", "01000", "01000"),
     "8": ("01110", "10001", "10001", "01110", "10001", "10001", "01110"),
     "9": ("01110", "10001", "10001", "01111", "00001", "00001", "01110"),
+    "c": ("00000", "00000", "01110", "10001", "10000", "10001", "01110"),
     "a": ("00000", "00000", "01110", "00001", "01111", "10001", "01111"),
     "e": ("00000", "00000", "01110", "10001", "11111", "10000", "01111"),
     "f": ("00110", "01001", "01000", "11100", "01000", "01000", "01000"),
     "g": ("00000", "00000", "01111", "10001", "01111", "00001", "01110"),
     "m": ("00000", "00000", "11010", "10101", "10101", "10101", "10101"),
     "n": ("00000", "00000", "11110", "10001", "10001", "10001", "10001"),
+    "o": ("00000", "00000", "01110", "10001", "10001", "10001", "01110"),
     "p": ("00000", "00000", "11110", "10001", "11110", "10000", "10000"),
     "r": ("00000", "00000", "10110", "11001", "10000", "10000", "10000"),
+    "s": ("00000", "00000", "01111", "10000", "01110", "00001", "11110"),
+    "L": ("10000", "10000", "10000", "10000", "10000", "10000", "11111"),
+    "R": ("11110", "10001", "10001", "11110", "10100", "10010", "10001"),
 }
 
 
@@ -910,7 +1035,11 @@ def run_test_mode(args: argparse.Namespace) -> int:
     params = TrackerParams(
         roi=roi,
         voxel_size=float(args.voxel_size),
-        grid=GridParams(cell_size=float(args.cell_size), count_threshold=int(args.grid_T)),
+        grid=GridParams(
+            cell_size=float(args.cell_size),
+            count_threshold=int(args.grid_T),
+            min_instance_points=int(getattr(args, "min_instance_points", 0)),
+        ),
         mot=MotParams(gate_distance=float(args.gate), max_missed=int(args.max_missed)),
         fit=FitParams(window_size=int(args.K), ema_alpha=float(args.alpha)),
     )
@@ -1009,6 +1138,8 @@ class RosTreeTrackerNode:
         self.row_fit_iters = int(rospy.get_param("~row_fit_iters", 2))
         self.row_fit_history_frames = int(rospy.get_param("~row_fit_history_frames", 20))
         self.row_fit_min_conf = float(rospy.get_param("~row_fit_min_conf", 0.0))
+        self.row_fit_parallel = _as_bool(rospy.get_param("~row_fit_parallel", False), default=False)
+        self.row_fit_hold_last = _as_bool(rospy.get_param("~row_fit_hold_last", True), default=True)
         self.row_fit_fixed_frame = rospy.get_param("~row_fit_fixed_frame", "")
         self.row_fit_fixed_frame_timeout = float(rospy.get_param("~row_fit_fixed_frame_timeout", 0.05))
         self.export_dir = rospy.get_param("~export_dir", "")
@@ -1019,6 +1150,8 @@ class RosTreeTrackerNode:
         self.bev_height_px = int(rospy.get_param("~bev_height_px", 0))
         self.export_draw_ids = _as_bool(rospy.get_param("~export_draw_ids", True), default=True)
         self.export_draw_crowns = _as_bool(rospy.get_param("~export_draw_crowns", True), default=True)
+        self.export_draw_rows = _as_bool(rospy.get_param("~export_draw_rows", True), default=True)
+        self.export_white_bg = _as_bool(rospy.get_param("~export_white_bg", False), default=False)
 
         roi = RoiParams(
             x_min=float(rospy.get_param("~roi_x_min", 0.0)),
@@ -1034,6 +1167,7 @@ class RosTreeTrackerNode:
             grid=GridParams(
                 cell_size=float(rospy.get_param("~cell_size", 0.10)),
                 count_threshold=int(rospy.get_param("~grid_T", 5)),
+                min_instance_points=int(rospy.get_param("~min_instance_points", 0)),
             ),
             mot=MotParams(
                 gate_distance=float(rospy.get_param("~gate_distance", 0.30)),
@@ -1062,6 +1196,8 @@ class RosTreeTrackerNode:
         self._row_fit_hist_left: Optional[Deque[np.ndarray]] = None
         self._row_fit_hist_right: Optional[Deque[np.ndarray]] = None
         self._row_fit_hist_fixed: Optional[Deque[np.ndarray]] = None
+        self._row_fit_last_left: Optional[Dict] = None
+        self._row_fit_last_right: Optional[Dict] = None
         self._tf_buffer = None
         self._tf_listener = None
         self._row_fit_fixed_frame: str = ""
@@ -1213,6 +1349,8 @@ class RosTreeTrackerNode:
                 "export_max_frames": int(self.export_max_frames),
                 "draw_ids": bool(self.export_draw_ids),
                 "draw_crowns": bool(self.export_draw_crowns),
+                "draw_rows": bool(self.export_draw_rows),
+                "white_bg": bool(self.export_white_bg),
             },
             "tracker_params": {
                 "roi": {
@@ -1226,6 +1364,7 @@ class RosTreeTrackerNode:
                 "voxel_size": float(self.params.voxel_size),
                 "cell_size": float(self.params.grid.cell_size),
                 "grid_T": int(self.params.grid.count_threshold),
+                "min_instance_points": int(self.params.grid.min_instance_points),
                 "gate_distance": float(self.params.mot.gate_distance),
                 "max_missed": int(self.params.mot.max_missed),
                 "K": int(self.params.fit.window_size),
@@ -1238,10 +1377,24 @@ class RosTreeTrackerNode:
                 "iters": int(self.row_fit_iters),
                 "history_frames": int(self.row_fit_history_frames),
                 "min_conf": float(self.row_fit_min_conf),
+                "parallel": bool(self.row_fit_parallel),
+                "hold_last": bool(self.row_fit_hold_last),
                 "fixed_frame": str(self._row_fit_fixed_frame),
                 "fixed_frame_timeout": float(self._row_fit_fixed_timeout),
-                "grouping": {"left": "cy > 0", "right": "cy < 0", "cy == 0": "ignored"},
-                "method": "PCA/TLS + deterministic inlier filtering",
+                "grouping": (
+                    {
+                        "method": "k=2 clustering on lateral projection (perpendicular to common PCA direction)",
+                        "left": "cluster with larger median cy",
+                        "right": "cluster with smaller median cy",
+                    }
+                    if bool(self.row_fit_parallel)
+                    else {"left": "cy > 0", "right": "cy < 0", "cy == 0": "ignored"}
+                ),
+                "method": (
+                    "PCA/TLS + deterministic inlier filtering (parallel_direction)"
+                    if bool(self.row_fit_parallel)
+                    else "PCA/TLS + deterministic inlier filtering"
+                ),
             },
         }
 
@@ -1282,7 +1435,8 @@ class RosTreeTrackerNode:
         roi = self.params.roi
         w = int(bev.width_px)
         h = int(bev.height_px)
-        img = np.zeros((h, w, 3), dtype=np.uint8)
+        bg_white = bool(self.export_white_bg)
+        img = np.full((h, w, 3), 255, dtype=np.uint8) if bg_white else np.zeros((h, w, 3), dtype=np.uint8)
 
         density_clip = 20.0
         pts = points_xyz.astype(np.float32, copy=False)
@@ -1298,28 +1452,35 @@ class RosTreeTrackerNode:
                 counts = np.bincount(lin, minlength=int(h * w)).reshape((h, w))
                 counts_clip = np.minimum(counts.astype(np.float32, copy=False), float(density_clip))
                 gray = (np.log1p(counts_clip) / float(math.log1p(density_clip)) * 255.0).astype(np.uint8)
-                img[:, :, 0] = gray
-                img[:, :, 1] = gray
-                img[:, :, 2] = gray
+                if bg_white:
+                    gray_bg = (255 - gray).astype(np.uint8, copy=False)
+                    img[:, :, 0] = gray_bg
+                    img[:, :, 1] = gray_bg
+                    img[:, :, 2] = gray_bg
+                else:
+                    img[:, :, 0] = gray
+                    img[:, :, 1] = gray
+                    img[:, :, 2] = gray
 
         if isinstance(row_fit_payload, dict):
             left = row_fit_payload.get("left", {})
             right = row_fit_payload.get("right", {})
-            for side, color in (("left", (0, 0, 255)), ("right", (255, 0, 0))):
-                block = left if side == "left" else right
-                seg = block.get("segment") if isinstance(block, dict) else None
-                if not (isinstance(seg, dict) and isinstance(seg.get("pA"), list) and isinstance(seg.get("pB"), list)):
-                    continue
-                pA = seg["pA"]
-                pB = seg["pB"]
-                try:
-                    u0 = int(math.floor((float(roi.y_max) - float(pA[1])) / float(bev.res)))
-                    v0 = int(math.floor((float(roi.x_max) - float(pA[0])) / float(bev.res)))
-                    u1 = int(math.floor((float(roi.y_max) - float(pB[1])) / float(bev.res)))
-                    v1 = int(math.floor((float(roi.x_max) - float(pB[0])) / float(bev.res)))
-                    _draw_line(img, u0=u0, v0=v0, u1=u1, v1=v1, color=color)
-                except Exception:
-                    continue
+            if bool(self.export_draw_rows):
+                for side, color in (("left", (0, 0, 255)), ("right", (255, 0, 0))):
+                    block = left if side == "left" else right
+                    seg = block.get("segment") if isinstance(block, dict) else None
+                    if not (isinstance(seg, dict) and isinstance(seg.get("pA"), list) and isinstance(seg.get("pB"), list)):
+                        continue
+                    pA = seg["pA"]
+                    pB = seg["pB"]
+                    try:
+                        u0 = int(math.floor((float(roi.y_max) - float(pA[1])) / float(bev.res)))
+                        v0 = int(math.floor((float(roi.x_max) - float(pA[0])) / float(bev.res)))
+                        u1 = int(math.floor((float(roi.y_max) - float(pB[1])) / float(bev.res)))
+                        v1 = int(math.floor((float(roi.x_max) - float(pB[0])) / float(bev.res)))
+                        _draw_line(img, u0=u0, v0=v0, u1=u1, v1=v1, color=color)
+                    except Exception:
+                        continue
 
         for det in detections:
             try:
@@ -1336,12 +1497,37 @@ class RosTreeTrackerNode:
                     _draw_circle_outline(img, u=u0, v=v0, r=r_px, color=color)
             _draw_disc(img, u=u0, v=v0, r=2, color=color)
             if bool(self.export_draw_ids):
-                _draw_text_5x7(img, u=u0 + 3, v=v0 - 8, text=str(int(det.tree_id)), color=(255, 255, 255), scale=1)
+                text_color = (0, 0, 0) if bg_white else (255, 255, 255)
+                _draw_text_5x7(img, u=u0 + 3, v=v0 - 8, text=str(int(det.tree_id)), color=text_color, scale=1)
 
         file_text = f"frame_{int(frame_index):06d}.png"
         stamp_text = f"{float(stamp_sec):.6f}"
-        _draw_text_5x7(img, u=4, v=4, text=file_text, color=(255, 255, 255), scale=2)
-        _draw_text_5x7(img, u=4, v=4 + (7 + 2) * 2, text=stamp_text, color=(255, 255, 255), scale=2)
+        text_color = (0, 0, 0) if bg_white else (255, 255, 255)
+        _draw_text_5x7(img, u=4, v=4, text=file_text, color=text_color, scale=2)
+        _draw_text_5x7(img, u=4, v=4 + (7 + 2) * 2, text=stamp_text, color=text_color, scale=2)
+        if isinstance(row_fit_payload, dict):
+            lines: List[str] = []
+            for side, block in (("L", row_fit_payload.get("left", {})), ("R", row_fit_payload.get("right", {}))):
+                if not isinstance(block, dict) or not bool(block.get("valid", False)):
+                    continue
+                inliers = int(block.get("inliers", 0))
+                total = int(block.get("total", 0))
+                rms = float(block.get("rms", 0.0))
+                conf_raw = block.get("conf", None)
+                try:
+                    conf = float(conf_raw)
+                except Exception:
+                    conf = float("nan")
+                if not math.isfinite(conf):
+                    if total <= 0 or inliers <= 0:
+                        conf = 0.0
+                    else:
+                        ratio = float(inliers) / float(total)
+                        conf = ratio * float(math.exp(-rms / float(max(1e-6, float(self.row_fit_inlier_dist)))))
+                        conf = float(_clamp(conf, 0.0, 1.0))
+                lines.append(f"{side}: {inliers}/{total} rms={rms:.3f} conf={conf:.2f}")
+            for i, t in enumerate(lines):
+                _draw_text_5x7(img, u=4, v=4 + (7 + 2) * 2 * (2 + i), text=t, color=text_color, scale=2)
         return img
 
     def _export_bev_frame(
@@ -1386,7 +1572,7 @@ class RosTreeTrackerNode:
             detections_pub = detections_all if bool(self.publish_missed) else detections_seen
             self._publish_outputs(msg, detections_pub)
 
-            need_row_fit = (self.pub_row_fit_json is not None) or bool(self._export_enabled)
+            need_row_fit = (self.pub_row_fit_json is not None) or (bool(self._export_enabled) and bool(self.export_draw_rows))
             row_fit_payload: Optional[Dict] = None
             if bool(need_row_fit):
                 min_conf = float(max(0.0, self.row_fit_min_conf))
@@ -1410,7 +1596,7 @@ class RosTreeTrackerNode:
                             msg.header.stamp,
                             rospy.Duration(float(self._row_fit_fixed_timeout)),
                         )
-                        xy_cur_msg = np.array([[float(d.cx), float(d.cy)] for d in det_fit], dtype=np.float32)
+                        xy_cur_msg = np.array([[float(d.cx), float(d.cy)] for d in det_fit], dtype=np.float32).reshape((-1, 2))
                         xy_cur_fixed = _apply_tf_xy(xy_cur_msg, tf_msg_to_fixed)
                         if self._row_fit_hist_fixed is not None:
                             self._row_fit_hist_fixed.append(xy_cur_fixed)
@@ -1449,8 +1635,8 @@ class RosTreeTrackerNode:
                         rospy.logwarn_throttle(2.0, "[orchard_tree_tracker] row_fit_fixed_frame tf failed: %s", str(exc))
 
                 if not (int(left_xy.shape[0]) > 0 or int(right_xy.shape[0]) > 0):
-                    left_xy_cur = np.array([[float(d.cx), float(d.cy)] for d in det_fit if float(d.cy) > 0.0], dtype=np.float32)
-                    right_xy_cur = np.array([[float(d.cx), float(d.cy)] for d in det_fit if float(d.cy) < 0.0], dtype=np.float32)
+                    left_xy_cur = np.array([[float(d.cx), float(d.cy)] for d in det_fit if float(d.cy) > 0.0], dtype=np.float32).reshape((-1, 2))
+                    right_xy_cur = np.array([[float(d.cx), float(d.cy)] for d in det_fit if float(d.cy) < 0.0], dtype=np.float32).reshape((-1, 2))
 
                     left_xy = left_xy_cur
                     right_xy = right_xy_cur
@@ -1468,18 +1654,99 @@ class RosTreeTrackerNode:
                             else np.empty((0, 2), dtype=np.float32)
                         )
 
-                left_valid, left_p0, left_v, left_stats = fit_line_pca(
-                    left_xy,
-                    inlier_dist=float(self.row_fit_inlier_dist),
-                    min_points=int(self.row_fit_min_points),
-                    iters=int(self.row_fit_iters),
-                )
-                right_valid, right_p0, right_v, right_stats = fit_line_pca(
-                    right_xy,
-                    inlier_dist=float(self.row_fit_inlier_dist),
-                    min_points=int(self.row_fit_min_points),
-                    iters=int(self.row_fit_iters),
-                )
+                left_valid = False
+                right_valid = False
+                left_p0 = np.zeros((2,), dtype=np.float32)
+                right_p0 = np.zeros((2,), dtype=np.float32)
+                left_v = np.zeros((2,), dtype=np.float32)
+                right_v = np.zeros((2,), dtype=np.float32)
+                left_stats: Dict[str, float] = {"total": float(left_xy.shape[0]), "inliers": 0.0, "rms": 0.0}
+                right_stats: Dict[str, float] = {"total": float(right_xy.shape[0]), "inliers": 0.0, "rms": 0.0}
+
+                if bool(self.row_fit_parallel):
+                    v_common: Optional[np.ndarray] = None
+                    xy_all = (
+                        np.concatenate([left_xy, right_xy], axis=0)
+                        if int(left_xy.shape[0]) > 0 or int(right_xy.shape[0]) > 0
+                        else np.empty((0, 2), dtype=np.float32)
+                    )
+                    if int(xy_all.shape[0]) >= 2:
+                        mu_all = np.mean(xy_all, axis=0)
+                        x = xy_all - mu_all[None, :]
+                        cov = (x.T @ x).astype(np.float32, copy=False)
+                        evals, evecs = np.linalg.eigh(cov)
+                        v0 = evecs[:, int(np.argmax(evals))]
+                        n0 = float(np.linalg.norm(v0))
+                        if n0 > 1e-12:
+                            v_common = (v0 / n0).astype(np.float32, copy=False)
+                            if float(v_common[0]) < 0.0 or (
+                                abs(float(v_common[0])) < 1e-12 and float(v_common[1]) < 0.0
+                            ):
+                                v_common = (-v_common).astype(np.float32, copy=False)
+
+                    if v_common is None and bool(self.row_fit_hold_last):
+                        prev = self._row_fit_last_left if self._row_fit_last_left is not None else self._row_fit_last_right
+                        if isinstance(prev, dict) and isinstance(prev.get("v", None), list) and len(prev.get("v", [])) == 2:
+                            try:
+                                v_common = np.array([float(prev["v"][0]), float(prev["v"][1])], dtype=np.float32)
+                            except Exception:
+                                v_common = None
+
+                    if v_common is not None:
+                        n_vc = float(np.linalg.norm(v_common))
+                        if n_vc > 1e-12:
+                            v_common = (v_common / n_vc).astype(np.float32, copy=False)
+                            if float(v_common[0]) < 0.0 or (
+                                abs(float(v_common[0])) < 1e-12 and float(v_common[1]) < 0.0
+                            ):
+                                v_common = (-v_common).astype(np.float32, copy=False)
+
+                            if int(xy_all.shape[0]) >= 2:
+                                nvec = np.array([-float(v_common[1]), float(v_common[0])], dtype=np.float32)
+                                s = (float(nvec[0]) * xy_all[:, 0] + float(nvec[1]) * xy_all[:, 1]).astype(np.float32, copy=False)
+                                ok_split, mask_low, _, _ = kmeans_1d_2clusters(s, iters=10)
+                                if bool(ok_split):
+                                    a = xy_all[mask_low]
+                                    b = xy_all[~mask_low]
+                                    if int(a.shape[0]) > 0 and int(b.shape[0]) > 0:
+                                        med_a = float(np.median(a[:, 1]))
+                                        med_b = float(np.median(b[:, 1]))
+                                        if (med_a > med_b) or (abs(med_a - med_b) < 1e-9 and int(a.shape[0]) >= int(b.shape[0])):
+                                            left_xy = a
+                                            right_xy = b
+                                        else:
+                                            left_xy = b
+                                            right_xy = a
+                                        left_stats["total"] = float(left_xy.shape[0])
+                                        right_stats["total"] = float(right_xy.shape[0])
+
+                            left_valid, left_p0, left_v, left_stats = fit_line_fixed_direction(
+                                left_xy,
+                                v_dir=v_common,
+                                inlier_dist=float(self.row_fit_inlier_dist),
+                                min_points=int(self.row_fit_min_points),
+                                iters=int(self.row_fit_iters),
+                            )
+                            right_valid, right_p0, right_v, right_stats = fit_line_fixed_direction(
+                                right_xy,
+                                v_dir=v_common,
+                                inlier_dist=float(self.row_fit_inlier_dist),
+                                min_points=int(self.row_fit_min_points),
+                                iters=int(self.row_fit_iters),
+                            )
+                else:
+                    left_valid, left_p0, left_v, left_stats = fit_line_pca(
+                        left_xy,
+                        inlier_dist=float(self.row_fit_inlier_dist),
+                        min_points=int(self.row_fit_min_points),
+                        iters=int(self.row_fit_iters),
+                    )
+                    right_valid, right_p0, right_v, right_stats = fit_line_pca(
+                        right_xy,
+                        inlier_dist=float(self.row_fit_inlier_dist),
+                        min_points=int(self.row_fit_min_points),
+                        iters=int(self.row_fit_iters),
+                    )
 
                 left_seg_valid, left_pA, left_pB = (False, np.zeros((2,), dtype=np.float32), np.zeros((2,), dtype=np.float32))
                 if bool(left_valid):
@@ -1489,37 +1756,80 @@ class RosTreeTrackerNode:
                 if bool(right_valid):
                     right_seg_valid, right_pA, right_pB = clip_line_to_roi(right_p0, right_v, self.params.roi)
 
+                left_block: Dict[str, object] = {
+                    "valid": bool(left_valid),
+                    "p0": [float(left_p0[0]), float(left_p0[1])] if bool(left_valid) else None,
+                    "v": [float(left_v[0]), float(left_v[1])] if bool(left_valid) else None,
+                    "segment": (
+                        {"pA": [float(left_pA[0]), float(left_pA[1])], "pB": [float(left_pB[0]), float(left_pB[1])]}
+                        if bool(left_seg_valid)
+                        else None
+                    ),
+                    "inliers": int(left_stats.get("inliers", 0.0)),
+                    "total": int(left_stats.get("total", 0.0)),
+                    "rms": float(left_stats.get("rms", 0.0)),
+                    "conf": float(
+                        _clamp(
+                            (float(left_stats.get("inliers", 0.0)) / float(max(1.0, float(left_stats.get("total", 0.0)))))
+                            * math.exp(-float(left_stats.get("rms", 0.0)) / float(max(1e-6, float(self.row_fit_inlier_dist)))),
+                            0.0,
+                            1.0,
+                        )
+                    )
+                    if bool(left_valid)
+                    else 0.0,
+                }
+
+                right_block: Dict[str, object] = {
+                    "valid": bool(right_valid),
+                    "p0": [float(right_p0[0]), float(right_p0[1])] if bool(right_valid) else None,
+                    "v": [float(right_v[0]), float(right_v[1])] if bool(right_valid) else None,
+                    "segment": (
+                        {"pA": [float(right_pA[0]), float(right_pA[1])], "pB": [float(right_pB[0]), float(right_pB[1])]}
+                        if bool(right_seg_valid)
+                        else None
+                    ),
+                    "inliers": int(right_stats.get("inliers", 0.0)),
+                    "total": int(right_stats.get("total", 0.0)),
+                    "rms": float(right_stats.get("rms", 0.0)),
+                    "conf": float(
+                        _clamp(
+                            (float(right_stats.get("inliers", 0.0)) / float(max(1.0, float(right_stats.get("total", 0.0)))))
+                            * math.exp(-float(right_stats.get("rms", 0.0)) / float(max(1e-6, float(self.row_fit_inlier_dist)))),
+                            0.0,
+                            1.0,
+                        )
+                    )
+                    if bool(right_valid)
+                    else 0.0,
+                }
+
+                if bool(self.row_fit_hold_last):
+                    if not bool(left_block.get("valid", False)) and isinstance(self._row_fit_last_left, dict):
+                        held = dict(self._row_fit_last_left)
+                        held["valid"] = False
+                        held["held"] = True
+                        left_block = held
+                    if not bool(right_block.get("valid", False)) and isinstance(self._row_fit_last_right, dict):
+                        held = dict(self._row_fit_last_right)
+                        held["valid"] = False
+                        held["held"] = True
+                        right_block = held
+
+                if bool(left_valid) and bool(left_seg_valid):
+                    self._row_fit_last_left = dict(left_block)
+                if bool(right_valid) and bool(right_seg_valid):
+                    self._row_fit_last_right = dict(right_block)
+
                 row_fit_payload = {
                     "frame_index": frame_index,
                     "stamp": stamp_sec,
                     "frame_id": str(msg.header.frame_id),
                     "fixed_frame": str(self._row_fit_fixed_frame),
-                    "left": {
-                        "valid": bool(left_valid),
-                        "p0": [float(left_p0[0]), float(left_p0[1])] if bool(left_valid) else None,
-                        "v": [float(left_v[0]), float(left_v[1])] if bool(left_valid) else None,
-                        "segment": (
-                            {"pA": [float(left_pA[0]), float(left_pA[1])], "pB": [float(left_pB[0]), float(left_pB[1])]}
-                            if bool(left_seg_valid)
-                            else None
-                        ),
-                        "inliers": int(left_stats.get("inliers", 0.0)),
-                        "total": int(left_stats.get("total", 0.0)),
-                        "rms": float(left_stats.get("rms", 0.0)),
-                    },
-                    "right": {
-                        "valid": bool(right_valid),
-                        "p0": [float(right_p0[0]), float(right_p0[1])] if bool(right_valid) else None,
-                        "v": [float(right_v[0]), float(right_v[1])] if bool(right_valid) else None,
-                        "segment": (
-                            {"pA": [float(right_pA[0]), float(right_pA[1])], "pB": [float(right_pB[0]), float(right_pB[1])]}
-                            if bool(right_seg_valid)
-                            else None
-                        ),
-                        "inliers": int(right_stats.get("inliers", 0.0)),
-                        "total": int(right_stats.get("total", 0.0)),
-                        "rms": float(right_stats.get("rms", 0.0)),
-                    },
+                    "parallel": bool(self.row_fit_parallel),
+                    "hold_last": bool(self.row_fit_hold_last),
+                    "left": left_block,
+                    "right": right_block,
                 }
 
                 if self.pub_row_fit_json is not None:
@@ -1798,6 +2108,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--voxel_size", type=float, default=0.03)
     parser.add_argument("--cell_size", type=float, default=0.10)
     parser.add_argument("--grid_T", type=int, default=5)
+    parser.add_argument(
+        "--min_instance_points",
+        type=int,
+        default=0,
+        help="Ignore instances/clusters with fewer than this many points (after voxel downsample).",
+    )
     parser.add_argument("--gate", type=float, default=0.30)
     parser.add_argument("--max_missed", type=int, default=10)
     parser.add_argument("--K", type=int, default=20)

@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-  <!-- Launch the simple two points navigator node -->
-  <node pkg="continuous_navigation" type="simple_two_points_navigator" name="simple_two_points_navigator" output="screen">
-  </node>
-</launch> 

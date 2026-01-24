@@ -6,6 +6,10 @@ WS_DIR="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
 PORT="${1:-11347}"
 WORLD_FILE="${2:-${WS_DIR}/src/pcd_gazebo_world/worlds/orchard_from_pcd_validated_by_bag.world}"
+LIDAR_HZ="${LIDAR_HZ:-10}"
+LIDAR_SAMPLES="${LIDAR_SAMPLES:-440}"
+USE_SKID_STEER="${USE_SKID_STEER:-false}"
+USE_PLANAR_MOVE="${USE_PLANAR_MOVE:-true}"
 
 # Normalize to absolute paths; roslaunch runs nodes with cwd=$ROS_HOME, so relative paths would break.
 WORLD_FILE="$(python3 -c 'import os,sys; print(os.path.abspath(os.path.expanduser(sys.argv[1])))' "${WORLD_FILE}")"
@@ -38,6 +42,6 @@ source "${WS_DIR}/devel/setup.bash"
 exec roslaunch pcd_gazebo_world orchard_pcd_sim.launch \
   gui:=false \
   gazebo_master_uri:="${GAZEBO_MASTER_URI}" \
-  gpu:=false organize_cloud:=false lidar_hz:=2 lidar_samples:=60 \
-  use_skid_steer:=false use_planar_move:=true \
+  gpu:=false organize_cloud:=false lidar_hz:="${LIDAR_HZ}" lidar_samples:="${LIDAR_SAMPLES}" \
+  use_skid_steer:="${USE_SKID_STEER}" use_planar_move:="${USE_PLANAR_MOVE}" \
   world_name:="${WORLD_FILE}"

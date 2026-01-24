@@ -5,11 +5,16 @@ from __future__ import annotations
 
 import json
 import struct
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
+
 import rospy
 import tf2_ros
 from geometry_msgs.msg import Point

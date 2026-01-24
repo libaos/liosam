@@ -12,13 +12,15 @@
   <arg name="use_skid_steer" default="false"/>
   <arg name="use_planar_move" default="true"/>
 
+  <arg name="python_exec" default="$(optenv ROS_PYTHON_EXEC /mysda/w/w/lio_ws/conda_envs/randla39/bin/python3)" />
+
   <arg name="path_file" default="$(find pcd_gazebo_world)/maps/runs/rosbag_path.json"/>
   <arg name="path_frame" default="odom"/>
   <arg name="path_rate" default="1.0"/>
 
   <arg name="model_name" default="scout"/>
   <arg name="path_index" default="0"/>
-  <arg name="spawn_z" default="0.2"/>
+  <arg name="spawn_z" default="$(eval 0.25749 if arg('use_skid_steer') == 'true' else 0.2)"/>
 
   <arg name="record_csv" default="$(env PWD)/trajectory_data/pid_odom.csv"/>
 
@@ -49,13 +51,13 @@
     <arg name="use_planar_move" value="$(arg use_planar_move)"/>
   </include>
 
-  <node pkg="pcd_gazebo_world" type="set_model_pose_from_path.py" name="set_model_pose" output="screen"
+  <node pkg="pcd_gazebo_world" type="set_model_pose_from_path.py" name="set_model_pose" output="screen" launch-prefix="$(arg python_exec)"
         args="--path $(arg path_file) --model $(arg model_name) --index $(arg path_index) --z $(arg spawn_z) --wait 12"/>
 
-  <node pkg="pcd_gazebo_world" type="publish_path.py" name="publish_reference_path" output="screen"
+  <node pkg="pcd_gazebo_world" type="publish_path.py" name="publish_reference_path" output="screen" launch-prefix="$(arg python_exec)"
         args="--path $(arg path_file) --topic /reference_path --frame-id $(arg path_frame) --rate $(arg path_rate) --publish-goal 0"/>
 
-  <node pkg="pcd_gazebo_world" type="pid_path_follower.py" name="pid_path_follower" output="screen">
+  <node pkg="pcd_gazebo_world" type="pid_path_follower.py" name="pid_path_follower" output="screen" launch-prefix="$(arg python_exec)">
     <param name="kp" value="$(arg pid_kp)"/>
     <param name="ki" value="$(arg pid_ki)"/>
     <param name="kd" value="$(arg pid_kd)"/>
@@ -70,6 +72,6 @@
     <param name="cmd_vel_topic" value="/cmd_vel"/>
   </node>
 
-  <node pkg="pcd_gazebo_world" type="record_trajectory.py" name="record_trajectory" output="screen"
+  <node pkg="pcd_gazebo_world" type="record_trajectory.py" name="record_trajectory" output="screen" launch-prefix="$(arg python_exec)"
         args="--out $(arg record_csv) --odom-topic /odom"/>
 </launch>

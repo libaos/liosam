@@ -1,0 +1,92 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+  - Class: rviz/Selection
+    Name: Selection
+  - Class: rviz/Tool Properties
+    Name: Tool Properties
+  - Class: rviz/Views
+    Name: Views
+  - Class: rviz/Time
+    Name: Time
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz/Grid
+      Enabled: true
+      Name: Grid
+      Plane: XY
+      Cell Size: 1
+      Plane Cell Count: 30
+      Color: 160; 160; 160
+      Reference Frame: <Fixed Frame>
+    - Class: rviz/PointCloud2
+      Enabled: true
+      Name: pc_roi
+      Topic: /pc_roi
+      Color: 200; 200; 200
+      Color Transformer: FlatColor
+      Size (Pixels): 2
+      Style: Points
+      Position Transformer: XYZ
+      Use Fixed Frame: true
+    - Class: rviz/PointCloud2
+      Enabled: true
+      Name: tree_points
+      Topic: /tree_points
+      Color: 0; 255; 0
+      Color Transformer: FlatColor
+      Size (Pixels): 2
+      Style: Points
+      Position Transformer: XYZ
+      Use Fixed Frame: true
+    - Class: rviz/Map
+      Enabled: true
+      Name: bev_occ
+      Topic: /bev_occ
+      Alpha: 0.7
+      Color Scheme: map
+      Draw Behind: true
+    - Class: rviz/Path
+      Enabled: true
+      Name: corridor_centerline
+      Topic: /corridor_centerline
+      Color: 0; 170; 255
+      Line Style: Lines
+      Line Width: 0.05
+      Pose Style: None
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Name: corridor_debug
+      Marker Topic: /corridor_debug_markers
+  Enabled: true
+  Global Options:
+    Background Color: 0; 0; 0
+    Fixed Frame: base_link_est
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+    - Class: rviz/Measure
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 20
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Pitch: 1.57
+      Yaw: 0
+      Target Frame: base_link_est
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 900
+  Hide Left Dock: false
+  Hide Right Dock: true
+  Width: 1400
+  X: 50
+  Y: 50

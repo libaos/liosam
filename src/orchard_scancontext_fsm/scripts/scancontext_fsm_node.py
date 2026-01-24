@@ -3,11 +3,16 @@
 from __future__ import annotations
 
 import math
+import threading
 from collections import deque
 from dataclasses import dataclass
 from typing import Deque, Optional, Tuple
 
 import numpy as np
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
+
 import rospy
 from sensor_msgs import point_cloud2 as pc2
 from sensor_msgs.msg import PointCloud2

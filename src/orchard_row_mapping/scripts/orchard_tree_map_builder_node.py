@@ -8,6 +8,10 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 import numpy as np
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
+
 import rospy
 import tf2_ros
 from sensor_msgs import point_cloud2 as pc2

@@ -1,0 +1,16 @@
+input_topic: "/pc_roi"
+output_topic: "/bev_occ"
+output_topic_raw: "/bev_occ_raw"
+publish_raw: true
+output_frame: "base_link"
+use_tf: true
+
+grid_res: 0.05
+grid_x_min: 0.0
+grid_x_max: 20.0
+grid_y_min: -6.0
+grid_y_max: 6.0
+dilation_radius: 0.10
+unknown_mode: false
+
+log_interval: 2.0

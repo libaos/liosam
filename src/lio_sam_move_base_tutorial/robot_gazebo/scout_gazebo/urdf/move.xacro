@@ -2,6 +2,12 @@
 
 <robot name="my_car_move" xmlns:xacro="http://wiki.ros.org/xacro">
 
+    <!-- Drive plugin selection:
+         - Enabling BOTH skid_steer + planar_move at the same time will cause the robot to "乱跑".
+         - Default: planar_move only. -->
+    <xacro:property name="use_skid_steer" value="$(arg use_skid_steer)" />
+    <xacro:property name="use_planar_move" value="$(arg use_planar_move)" />
+
     <!-- 传动实现:用于连接控制器与关节 -->
     <xacro:macro name="joint_trans" params="joint_name">
         <!-- Transmission is important to link the joints and the controller -->
@@ -23,31 +29,39 @@
     <xacro:joint_trans joint_name="rear_left_wheel" />
     <xacro:joint_trans joint_name="rear_right_wheel" />
     <!-- 控制器 -->
-    <gazebo>
-  		<plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
-    		<updateRate>100.0</updateRate>
-    		<robotNamespace>/</robotNamespace>
-    		<leftFrontJoint>front_left_wheel</leftFrontJoint>
-    		<rightFrontJoint>front_right_wheel</rightFrontJoint>
-    		<leftRearJoint>rear_left_wheel</leftRearJoint>
-    		<rightRearJoint>rear_right_wheel</rightRearJoint>
-    		<wheelSeparation>${track}</wheelSeparation>
-    		<wheelDiameter>${wheel_radius * 2}</wheelDiameter>
-    		<robotBaseFrame>base_link</robotBaseFrame>
-    		<torque>20</torque>
-    		<topicName>cmd_vel</topicName>
-    		<broadcastTF>false</broadcastTF>
-  		</plugin>
-	</gazebo>
-	
-  <gazebo>
-    <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
-      <commandTopic>cmd_vel</commandTopic>
-      <odometryTopic>odom</odometryTopic>
-      <odometryFrame>odom</odometryFrame>
-      <odometryRate>20.0</odometryRate>
-      <robotBaseFrame>base_link</robotBaseFrame>
-    </plugin>
-  </gazebo>
+    <xacro:if value="${use_skid_steer}">
+        <gazebo>
+            <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
+                <updateRate>100.0</updateRate>
+                <robotNamespace>/</robotNamespace>
+                <leftFrontJoint>front_left_wheel</leftFrontJoint>
+                <rightFrontJoint>front_right_wheel</rightFrontJoint>
+                <leftRearJoint>rear_left_wheel</leftRearJoint>
+                <rightRearJoint>rear_right_wheel</rightRearJoint>
+                <wheelSeparation>${track}</wheelSeparation>
+                <wheelDiameter>${wheel_radius * 2}</wheelDiameter>
+                <robotBaseFrame>base_link</robotBaseFrame>
+                <torque>200</torque>
+                <commandTopic>cmd_vel</commandTopic>
+                <odometryTopic>odom</odometryTopic>
+                <odometryFrame>odom</odometryFrame>
+                <broadcastTF>true</broadcastTF>
+            </plugin>
+        </gazebo>
+    </xacro:if>
+
+    <xacro:unless value="${use_skid_steer}">
+        <xacro:if value="${use_planar_move}">
+            <gazebo>
+                <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+                    <commandTopic>cmd_vel</commandTopic>
+                    <odometryTopic>odom</odometryTopic>
+                    <odometryFrame>odom</odometryFrame>
+                    <odometryRate>20.0</odometryRate>
+                    <robotBaseFrame>base_link</robotBaseFrame>
+                </plugin>
+            </gazebo>
+        </xacro:if>
+    </xacro:unless>
 
 </robot>

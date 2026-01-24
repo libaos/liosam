@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 ========================================================================================
@@ -14,6 +14,7 @@ svgwrite: A Python library to create SVG drawings. http://pypi.python.org/pypi/s
 =======================================================================================
 """
 import roslib;
+import threading
 import rospy
 import svgwrite
 import math
@@ -23,6 +24,9 @@ import random
 from svgwrite import cm, mm
 from teb_local_planner.msg import FeedbackMsg, TrajectoryMsg, TrajectoryPointMsg
 from geometry_msgs.msg import PolygonStamped, Point32, Quaternion
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 
 
 # ================= PARAMETERS ==================
@@ -51,7 +55,7 @@ def sign(number):
     @return:  sign of number
     @rtype:   integer {1, -1, 0}  
     """
-    return cmp(number,0)
+    return (number > 0) - (number < 0)
 
 def arrowMarker(color='green', orientation='auto'):
     """

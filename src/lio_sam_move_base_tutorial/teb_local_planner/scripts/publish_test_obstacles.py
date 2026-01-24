@@ -1,8 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Author: christoph.roesmann@tu-dortmund.de
 
 import rospy, math
+import threading
+
+if not hasattr(threading.Thread, "isAlive"):
+  setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 from costmap_converter.msg import ObstacleArrayMsg, ObstacleMsg
 from geometry_msgs.msg import PolygonStamped, Point32
 
@@ -73,4 +77,3 @@ if __name__ == '__main__':
     publish_obstacle_msg()
   except rospy.ROSInterruptException:
     pass
-

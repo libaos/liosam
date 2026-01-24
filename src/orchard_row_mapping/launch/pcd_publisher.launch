@@ -4,8 +4,9 @@
   <arg name="frame_id" default="map" />
   <arg name="publish_max_points" default="0" />
   <arg name="sample_seed" default="0" />
+  <arg name="python_exec" default="$(optenv ROS_PYTHON_EXEC /mysda/w/w/lio_ws/conda_envs/randla39/bin/python3)" />
 
-  <node pkg="orchard_row_mapping" type="pcd_publisher_node.py" name="pcd_publisher" output="screen">
+  <node pkg="orchard_row_mapping" type="pcd_publisher_node.py" name="pcd_publisher" output="screen" launch-prefix="$(arg python_exec)">
     <param name="pcd_path" value="$(arg pcd_path)" />
     <param name="topic" value="$(arg topic)" />
     <param name="frame_id" value="$(arg frame_id)" />
@@ -13,4 +14,3 @@
     <param name="sample_seed" value="$(arg sample_seed)" />
   </node>
 </launch>
-

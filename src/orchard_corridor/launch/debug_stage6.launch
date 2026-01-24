@@ -1,0 +1,264 @@
+<launch>
+  <!-- Stage6: Gazebo closed-loop (velodyne_points -> corridor -> /cmd_vel) + map alignment + trajectory record -->
+
+  <!-- Gazebo -->
+  <arg name="world_name" default="$(find pcd_gazebo_world)/worlds/orchard_from_pcd_validated_by_bag.world" />
+  <arg name="gui" default="true" />
+  <arg name="paused" default="false" />
+  <!-- NOTE: 11345 is commonly used by other Gazebo runs; default to 11346 to reduce port conflicts. -->
+  <arg name="gazebo_master_uri" default="$(optenv GAZEBO_MASTER_URI http://localhost:11346)" />
+  <arg name="gazebo_ip" default="$(optenv GAZEBO_IP 127.0.0.1)" />
+  <arg name="use_planar_move" default="true" />
+  <arg name="use_skid_steer" default="false" />
+  <!-- Gazebo sensor load knobs (passed through to orchard_pcd_sim.launch) -->
+  <arg name="gpu" default="true" />
+  <arg name="organize_cloud" default="true" />
+  <arg name="lidar_hz" default="10" />
+  <arg name="lidar_samples" default="440" />
+  <arg name="pub_clock_frequency" default="100" />
+
+  <!-- Reference path (from rosbag) -->
+  <arg name="reference_path_file" default="$(find pcd_gazebo_world)/maps/runs/rosbag_path_map.json" />
+  <arg name="reference_path_topic" default="/reference_path" />
+  <arg name="publish_reference_path" default="true" />
+
+  <!-- Teleport robot to reference start pose (optional but recommended) -->
+  <arg name="teleport_to_reference_start" default="true" />
+  <arg name="gazebo_model_name" default="scout" />
+  <arg name="gazebo_reference_frame" default="world" />
+  <arg name="gazebo_model_z" default="0.2" />
+  <arg name="gazebo_wait_s" default="12.0" />
+
+  <!-- map->odom alignment (publish /tf_static) -->
+  <arg name="publish_map_to_odom" default="true" />
+  <arg name="map_frame" default="map" />
+  <arg name="odom_frame" default="odom" />
+  <arg name="odom_topic" default="/odom" />
+  <arg name="map_to_odom_wait_s" default="30.0" />
+
+  <!-- Trajectory recording (odom -> map CSV) -->
+  <arg name="record_trajectory" default="true" />
+  <arg name="trajectory_out_csv" default="/mysda/w/w/lio_ws/trajectory_data/closedloop_odom_map.csv" />
+  <arg name="trajectory_max_samples" default="0" />
+  <arg name="stop_when_trajectory_done" default="false" />
+  <arg name="trajectory_min_dt" default="0.05" />
+  <arg name="trajectory_tf_timeout" default="0.2" />
+
+  <!-- Python exec (prefer ROS_PYTHON_EXEC / conda py3.9) -->
+  <arg name="randla_env_prefix" default="$(optenv RANDLA_ENV_PREFIX /mysda/w/w/lio_ws/conda_envs/randla39)" />
+  <arg name="python_exec" default="$(eval optenv('ROS_PYTHON_EXEC', arg('randla_env_prefix') + '/bin/python3'))" />
+
+  <!-- Corridor pipeline (Stage5) -->
+  <arg name="points_topic" default="/velodyne_points" />
+  <arg name="cmd_vel_topic" default="/cmd_vel" />
+  <!-- If enabled, run both PID + corridor and mux their cmd_vel to `cmd_vel_topic`. -->
+  <arg name="use_cmd_mux" default="false" />
+  <arg name="cmd_vel_topic_corridor" default="/cmd_vel_corridor" />
+  <arg name="cmd_vel_topic_pid" default="/cmd_vel_pid" />
+  <arg
+    name="cmd_vel_topic_stage5"
+    default="$(eval arg('cmd_vel_topic_corridor') if str(arg('use_cmd_mux')).lower() == 'true' else arg('cmd_vel_topic'))" />
+  <arg
+    name="pid_cmd_vel_topic"
+    default="$(eval arg('cmd_vel_topic_pid') if str(arg('use_cmd_mux')).lower() == 'true' else arg('cmd_vel_topic'))" />
+  <arg name="output_frame" default="base_link" />
+  <arg name="use_tf" default="true" />
+  <arg name="use_randla" default="false" />
+  <arg name="tree_points_topic" default="/pc_roi" />
+  <arg name="preprocess_config" default="$(find orchard_corridor)/config/pointcloud_preprocess_sim.yaml" />
+  <arg name="bev_config" default="$(find orchard_corridor)/config/bev_occupancy_sim.yaml" />
+  <arg name="controller_enabled" default="false" />
+  <!-- Simulation default: looser clearance scaling so the robot doesn't crawl at ~0.05m/s. -->
+  <arg name="controller_config" default="$(find orchard_corridor)/config/controller_sim_fast.yaml" />
+  <arg name="centerline_config" default="$(find orchard_corridor)/config/centerline.yaml" />
+  <arg name="output_dir" default="/mysda/w/w/lio_ws/output/debug_stage6" />
+  <arg name="launch_rviz" default="true" />
+  <arg name="rviz_config" default="$(find orchard_corridor)/rviz/debug_stage6.rviz" />
+
+  <!-- Route ID (ScanContext prototype DB) -->
+  <arg name="use_sc_route_db" default="false" />
+  <arg name="sc_cloud_topic" default="$(arg points_topic)" />
+  <arg name="sc_db_path" default="/mysda/w/w/lio_ws/output/sc_route_db/2025-10-29-16-05-00_points_raw_K20_allframes.npz" />
+  <arg name="sc_metric" default="cosine" />
+  <arg name="sc_temperature" default="0.02" />
+  <arg name="sc_process_hz" default="2.0" />
+  <arg name="sc_max_points" default="60000" />
+  <arg name="sc_python_exec" default="$(optenv ROS_PYTHON_EXEC /usr/bin/python3)" />
+  <arg name="gate_conf_th_scdb" default="0.6" />
+
+  <!-- Optional: follow reference path using PID (instead of corridor controller) -->
+  <arg name="use_pid_follower" default="false" />
+  <arg
+    name="run_pid_follower"
+    default="$(eval 'true' if (str(arg('use_pid_follower')).lower() == 'true' or str(arg('use_cmd_mux')).lower() == 'true') else 'false')" />
+  <!-- NOTE: `pcd_gazebo_world/publish_path.py` uses latch=True, so publishing once is enough.
+       Re-publishing the same path can reset the PID follower's progress on self-intersecting paths (e.g. figure-8). -->
+  <arg name="reference_path_odom_rate" default="0" />
+  <arg
+    name="controller_enabled_effective"
+    default="$(eval 'false' if (str(arg('use_pid_follower')).lower() == 'true' and str(arg('use_cmd_mux')).lower() != 'true') else ('true' if str(arg('use_cmd_mux')).lower() == 'true' else arg('controller_enabled')))" />
+  <arg name="reference_path_odom_topic" default="/reference_path_odom" />
+
+  <arg name="pid_kp" default="1.6" />
+  <arg name="pid_ki" default="0.0" />
+  <arg name="pid_kd" default="0.15" />
+  <arg name="pid_v_max" default="0.45" />
+  <arg name="pid_v_min" default="0.05" />
+  <arg name="pid_max_omega" default="0.8" />
+  <arg name="pid_lookahead" default="0.8" />
+  <arg name="pid_k_dist" default="0.8" />
+  <arg name="pid_goal_tolerance" default="0.4" />
+  <arg name="pid_stop_at_goal" default="1" />
+
+  <param name="use_sim_time" value="true" />
+
+  <include file="$(find pcd_gazebo_world)/launch/orchard_pcd_sim.launch">
+    <arg name="world_name" value="$(arg world_name)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)" />
+    <arg name="gazebo_master_uri" value="$(arg gazebo_master_uri)" />
+    <arg name="gazebo_ip" value="$(arg gazebo_ip)" />
+    <arg name="use_planar_move" value="$(arg use_planar_move)" />
+    <arg name="use_skid_steer" value="$(arg use_skid_steer)" />
+    <arg name="gpu" value="$(arg gpu)" />
+    <arg name="organize_cloud" value="$(arg organize_cloud)" />
+    <arg name="lidar_hz" value="$(arg lidar_hz)" />
+    <arg name="lidar_samples" value="$(arg lidar_samples)" />
+    <arg name="pub_clock_frequency" value="$(arg pub_clock_frequency)" />
+  </include>
+
+  <node
+    if="$(arg teleport_to_reference_start)"
+    pkg="pcd_gazebo_world"
+    type="set_model_pose_from_path.py"
+    name="set_model_pose_from_reference_path"
+    output="screen"
+    launch-prefix="$(arg python_exec)"
+    args="--path $(arg reference_path_file) --model $(arg gazebo_model_name) --frame $(arg gazebo_reference_frame) --z $(arg gazebo_model_z) --wait $(arg gazebo_wait_s)" />
+
+  <node
+    if="$(arg publish_map_to_odom)"
+    pkg="pcd_gazebo_world"
+    type="set_map_to_odom_from_path.py"
+    name="set_map_to_odom_from_reference_path"
+    output="screen"
+    launch-prefix="$(arg python_exec)"
+    args="--path $(arg reference_path_file) --map-frame $(arg map_frame) --odom-frame $(arg odom_frame) --odom-topic $(arg odom_topic) --wait $(arg map_to_odom_wait_s)" />
+
+  <node
+    if="$(arg record_trajectory)"
+    pkg="pcd_gazebo_world"
+    type="record_trajectory.py"
+    name="record_closedloop_trajectory"
+    output="screen"
+    launch-prefix="$(arg python_exec)"
+    required="$(arg stop_when_trajectory_done)"
+    args="--out $(arg trajectory_out_csv) --max-samples $(arg trajectory_max_samples) --odom-topic $(arg odom_topic) --output-frame $(arg map_frame) --min-dt $(arg trajectory_min_dt) --tf-timeout $(arg trajectory_tf_timeout)" />
+
+  <node
+    if="$(arg publish_reference_path)"
+    pkg="pcd_gazebo_world"
+    type="publish_path.py"
+    name="publish_reference_path"
+    output="screen"
+    launch-prefix="$(arg python_exec)"
+    args="--path $(arg reference_path_file) --topic $(arg reference_path_topic) --rate 1.0 --publish-goal 0" />
+
+  <node
+    if="$(arg run_pid_follower)"
+    pkg="pcd_gazebo_world"
+    type="publish_path.py"
+    name="publish_reference_path_odom"
+    output="screen"
+    launch-prefix="$(arg python_exec)"
+    args="--path $(arg reference_path_file) --topic $(arg reference_path_odom_topic) --target-frame $(arg odom_frame) --tf-timeout 0.2 --wait-tf $(arg map_to_odom_wait_s) --rate $(arg reference_path_odom_rate) --publish-goal 0" />
+
+  <node if="$(arg run_pid_follower)" pkg="pcd_gazebo_world" type="pid_path_follower.py" name="pid_reference_follower" output="screen" launch-prefix="$(arg python_exec)">
+    <param name="kp" value="$(arg pid_kp)" />
+    <param name="ki" value="$(arg pid_ki)" />
+    <param name="kd" value="$(arg pid_kd)" />
+    <param name="v_max" value="$(arg pid_v_max)" />
+    <param name="v_min" value="$(arg pid_v_min)" />
+    <param name="max_omega" value="$(arg pid_max_omega)" />
+    <param name="lookahead" value="$(arg pid_lookahead)" />
+    <param name="k_dist" value="$(arg pid_k_dist)" />
+    <param name="goal_tolerance" value="$(arg pid_goal_tolerance)" />
+    <param name="stop_at_goal" value="$(arg pid_stop_at_goal)" />
+
+    <param name="path_topic" value="$(arg reference_path_odom_topic)" />
+    <param name="odom_topic" value="$(arg odom_topic)" />
+    <param name="cmd_vel_topic" value="$(arg pid_cmd_vel_topic)" />
+  </node>
+
+	  <include file="$(find orchard_corridor)/launch/debug_stage5.launch">
+	    <arg name="points_topic" value="$(arg points_topic)" />
+	    <arg name="tree_points_topic" value="$(arg tree_points_topic)" />
+	    <arg name="output_frame" value="$(arg output_frame)" />
+	    <arg name="use_tf" value="$(arg use_tf)" />
+	    <arg name="preprocess_config" value="$(arg preprocess_config)" />
+	    <arg name="bev_config" value="$(arg bev_config)" />
+	    <arg name="centerline_config" value="$(arg centerline_config)" />
+	    <arg name="use_randla" value="$(arg use_randla)" />
+	    <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic_stage5)" />
+	    <arg name="controller_enabled" value="$(arg controller_enabled_effective)" />
+	    <arg name="controller_config" value="$(arg controller_config)" />
+	    <arg name="python_exec" value="$(arg python_exec)" />
+	    <arg name="output_dir" value="$(arg output_dir)" />
+	    <arg name="launch_rviz" value="$(arg launch_rviz)" />
+	    <arg name="rviz_config" value="$(arg rviz_config)" />
+
+    <arg name="use_sc_route_db" value="$(arg use_sc_route_db)" />
+    <arg name="sc_cloud_topic" value="$(arg sc_cloud_topic)" />
+    <arg name="sc_db_path" value="$(arg sc_db_path)" />
+    <arg name="sc_metric" value="$(arg sc_metric)" />
+    <arg name="sc_temperature" value="$(arg sc_temperature)" />
+    <arg name="sc_process_hz" value="$(arg sc_process_hz)" />
+    <arg name="sc_max_points" value="$(arg sc_max_points)" />
+    <arg name="sc_python_exec" value="$(arg sc_python_exec)" />
+    <arg name="gate_conf_th_scdb" value="$(arg gate_conf_th_scdb)" />
+
+    <!-- Simulation uses real base_link; do not publish base_link_est->base_link alias. -->
+    <arg name="publish_base_link_alias" value="false" />
+  </include>
+
+  <node
+    if="$(arg use_cmd_mux)"
+    pkg="orchard_corridor"
+    type="cmd_vel_mux_node.py"
+    name="cmd_vel_mux"
+    output="screen"
+    launch-prefix="$(arg python_exec)">
+    <param name="cmd_out_topic" value="$(arg cmd_vel_topic)" />
+    <param name="cmd_corridor_topic" value="$(arg cmd_vel_topic_corridor)" />
+    <param name="cmd_pid_topic" value="$(arg cmd_vel_topic_pid)" />
+
+    <param name="corridor_path_topic" value="/corridor_centerline" />
+    <param name="corridor_quality_topic" value="/corridor_quality" />
+    <param name="corridor_clearance_topic" value="/corridor_clearance_min" />
+
+    <param name="odom_topic" value="$(arg odom_topic)" />
+    <param name="ref_path_topic" value="$(arg reference_path_odom_topic)" />
+
+    <!-- Smooth mode switches to reduce trajectory kinks. -->
+    <param name="transition_s" value="0.8" />
+    <!-- Reduce mode flapping: require stability and minimum dwell time. -->
+    <param name="min_mode_dwell_s" value="6.0" />
+    <!-- Allow faster corridor->PID exit to avoid error accumulation. -->
+    <param name="min_pid_to_corridor_dwell_s" value="6.0" />
+    <param name="min_corridor_to_pid_dwell_s" value="0.5" />
+    <param name="enter_hold_s" value="2.0" />
+    <!-- Make corridor entry more conservative (stay mostly on PID; corridor is "rescue"). -->
+    <param name="q_enter" value="0.99" />
+	    <param name="ref_err_enter" value="0.30" />
+	    <param name="heading_enter" value="0.40" />
+	    <!-- Optional mux output smoothing: rate limit only (no low-pass) to reduce micro jitter. -->
+	    <param name="out_filter_tau" value="0.0" />
+	    <param name="out_max_linear_accel" value="0.8" />
+	    <param name="out_max_angular_accel" value="1.6" />
+	    <!-- Extra guard: corridor centerline direction must match reference direction (in base frame). -->
+	    <param name="use_corridor_path_heading_guard" value="true" />
+	    <param name="corridor_path_heading_lookahead_m" value="1.0" />
+	    <param name="corridor_path_heading_enter" value="0.35" />
+	    <param name="corridor_path_heading_exit" value="0.70" />
+	  </node>
+	</launch>

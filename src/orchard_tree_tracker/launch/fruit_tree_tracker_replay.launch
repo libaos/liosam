@@ -26,6 +26,9 @@
   <arg name="bev_height_px" default="0" />
   <arg name="export_draw_ids" default="true" />
   <arg name="export_draw_crowns" default="true" />
+  <arg name="export_draw_rows" default="true" />
+  <!-- White background (paper-style). Default false keeps legacy dark theme. -->
+  <arg name="export_white_bg" default="false" />
 
   <!-- Row fit -->
   <arg name="row_fit_min_points" default="3" />
@@ -35,6 +38,10 @@
   <arg name="row_fit_history_frames" default="20" />
   <!-- Filter for row fit only (does not change ~json_out/CSV); 0 disables filtering -->
   <arg name="row_fit_min_conf" default="0.0" />
+  <!-- Optional: enforce left/right rows parallel (common direction) to avoid crossing lines -->
+  <arg name="row_fit_parallel" default="false" />
+  <!-- Optional: if a side is missing, keep last valid line segment -->
+  <arg name="row_fit_hold_last" default="true" />
   <!-- Optional: motion-compensated row fit via TF (e.g. map/odom_est). Empty disables. -->
   <arg name="row_fit_fixed_frame" default="" />
   <arg name="row_fit_fixed_frame_timeout" default="0.05" />
@@ -50,6 +57,7 @@
   <arg name="voxel_size" default="0.03" />
   <arg name="cell_size" default="0.10" />
   <arg name="grid_T" default="5" />
+  <arg name="min_instance_points" default="0" />
   <arg name="gate_distance" default="0.30" />
   <arg name="max_missed" default="10" />
   <arg name="K" default="20" />
@@ -81,12 +89,16 @@
     <arg name="bev_height_px" value="$(arg bev_height_px)" />
     <arg name="export_draw_ids" value="$(arg export_draw_ids)" />
     <arg name="export_draw_crowns" value="$(arg export_draw_crowns)" />
+    <arg name="export_draw_rows" value="$(arg export_draw_rows)" />
+    <arg name="export_white_bg" value="$(arg export_white_bg)" />
 
     <arg name="row_fit_min_points" value="$(arg row_fit_min_points)" />
     <arg name="row_fit_inlier_dist" value="$(arg row_fit_inlier_dist)" />
     <arg name="row_fit_iters" value="$(arg row_fit_iters)" />
     <arg name="row_fit_history_frames" value="$(arg row_fit_history_frames)" />
     <arg name="row_fit_min_conf" value="$(arg row_fit_min_conf)" />
+    <arg name="row_fit_parallel" value="$(arg row_fit_parallel)" />
+    <arg name="row_fit_hold_last" value="$(arg row_fit_hold_last)" />
     <arg name="row_fit_fixed_frame" value="$(arg row_fit_fixed_frame)" />
     <arg name="row_fit_fixed_frame_timeout" value="$(arg row_fit_fixed_frame_timeout)" />
 
@@ -100,6 +112,7 @@
     <arg name="voxel_size" value="$(arg voxel_size)" />
     <arg name="cell_size" value="$(arg cell_size)" />
     <arg name="grid_T" value="$(arg grid_T)" />
+    <arg name="min_instance_points" value="$(arg min_instance_points)" />
 
     <arg name="gate_distance" value="$(arg gate_distance)" />
     <arg name="max_missed" value="$(arg max_missed)" />

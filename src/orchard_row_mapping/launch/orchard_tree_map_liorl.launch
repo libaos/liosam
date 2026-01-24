@@ -1,14 +1,25 @@
 <launch>
   <arg name="config" default="$(find orchard_row_mapping)/config/liorl_tree_map.yaml" />
+  <arg name="randla_env_prefix" default="$(optenv RANDLA_ENV_PREFIX /mysda/w/w/lio_ws/conda_envs/randla39)" />
+  <arg name="randla_pythonpath" default="$(arg randla_env_prefix)/lib/python3.9/site-packages" />
+  <arg name="randla_ld_library_path" default="$(arg randla_env_prefix)/lib" />
+  <arg name="randla_path" default="$(arg randla_env_prefix)/bin" />
+  <!-- Use ROS_PYTHON_EXEC if set, otherwise fallback to RandLA env python. -->
+  <arg name="python_exec" default="$(eval optenv('ROS_PYTHON_EXEC', arg('randla_path') + '/python3'))" />
   <arg name="output_pcd" default="/mysda/w/w/lio_ws/maps/TreeMap_auto.pcd" />
   <arg name="voxel_size" default="0.10" />
 
-  <node pkg="orchard_row_mapping" type="orchard_segmentation_node.py" name="orchard_segmentation" output="screen">
-    <env name="PYTHONPATH" value="/mysda/w/w/lio_ws/.venv_orchard/lib/python3.8/site-packages:$(optenv PYTHONPATH)" />
+  <node pkg="orchard_row_mapping" type="orchard_segmentation_node.py" name="orchard_segmentation" output="screen" launch-prefix="$(arg python_exec)">
+    <env name="PATH" value="$(arg randla_path):$(optenv PATH)" />
+    <env name="PYTHONPATH" value="$(arg randla_pythonpath):$(optenv PYTHONPATH)" />
+    <env name="LD_LIBRARY_PATH" value="$(arg randla_ld_library_path):$(optenv LD_LIBRARY_PATH)" />
     <rosparam file="$(arg config)" command="load" />
   </node>
 
-  <node pkg="orchard_row_mapping" type="orchard_tree_map_builder_node.py" name="orchard_tree_map_builder" output="screen">
+  <node pkg="orchard_row_mapping" type="orchard_tree_map_builder_node.py" name="orchard_tree_map_builder" output="screen" launch-prefix="$(arg python_exec)">
+    <env name="PATH" value="$(arg randla_path):$(optenv PATH)" />
+    <env name="PYTHONPATH" value="$(arg randla_pythonpath):$(optenv PYTHONPATH)" />
+    <env name="LD_LIBRARY_PATH" value="$(arg randla_ld_library_path):$(optenv LD_LIBRARY_PATH)" />
     <param name="input_topic" value="/orchard_segmentation/tree_cloud" />
     <param name="map_frame" value="map" />
     <param name="output_pcd" value="$(arg output_pcd)" />

@@ -8,9 +8,20 @@ PORT="${1:-11347}"
 DEFAULT_PATH_JSON="${WS_DIR}/src/pcd_gazebo_world/maps/runs/rosbag_path.json"
 DEFAULT_WORLD_FILE="${WS_DIR}/src/pcd_gazebo_world/worlds/orchard_from_pcd_validated_by_bag.world"
 USE_VIA_POINTS="${USE_VIA_POINTS:-false}"
+USE_SKID_STEER="${USE_SKID_STEER:-false}"
+USE_PLANAR_MOVE="${USE_PLANAR_MOVE:-true}"
 WAYPOINT_MIN_DIST="${WAYPOINT_MIN_DIST:-}"
 WAYPOINT_TOLERANCE="${WAYPOINT_TOLERANCE:-}"
 LOCAL_PLANNER_OVERRIDE_PARAMS="${LOCAL_PLANNER_OVERRIDE_PARAMS:-}"
+LIDAR_HZ="${LIDAR_HZ:-10}"
+LIDAR_SAMPLES="${LIDAR_SAMPLES:-440}"
+MAP_YAML="${MAP_YAML:-}"
+COSTMAP_COMMON_PARAMS="${COSTMAP_COMMON_PARAMS:-}"
+TREE_CIRCLES_JSON="${TREE_CIRCLES_JSON:-}"
+TREE_CLEARANCE="${TREE_CLEARANCE:-}"
+TREE_DEFAULT_RADIUS="${TREE_DEFAULT_RADIUS:-}"
+GOAL_TIMEOUT_S="${GOAL_TIMEOUT_S:-}"
+SHUTDOWN_ON_PATH_DONE="${SHUTDOWN_ON_PATH_DONE:-false}"
 
 # Support both:
 #   run_orchard_teb_server.sh PORT [PATH_JSON] [WORLD_FILE] [MODE]
@@ -120,14 +131,52 @@ if [[ -n "${LOCAL_PLANNER_OVERRIDE_PARAMS}" ]]; then
   EXTRA_ARGS+=(local_planner_override_params:="${LOCAL_PLANNER_OVERRIDE_PARAMS}")
 fi
 
+if [[ -n "${MAP_YAML}" ]]; then
+  MAP_YAML="$(python3 -c 'import os,sys; print(os.path.abspath(os.path.expanduser(sys.argv[1])))' "${MAP_YAML}")"
+  if [[ ! -f "${MAP_YAML}" ]]; then
+    echo "ERROR: MAP_YAML not found: ${MAP_YAML}" >&2
+    exit 1
+  fi
+  EXTRA_ARGS+=(map_yaml:="${MAP_YAML}")
+fi
+
+if [[ -n "${COSTMAP_COMMON_PARAMS}" ]]; then
+  COSTMAP_COMMON_PARAMS="$(python3 -c 'import os,sys; print(os.path.abspath(os.path.expanduser(sys.argv[1])))' "${COSTMAP_COMMON_PARAMS}")"
+  if [[ ! -f "${COSTMAP_COMMON_PARAMS}" ]]; then
+    echo "ERROR: COSTMAP_COMMON_PARAMS not found: ${COSTMAP_COMMON_PARAMS}" >&2
+    exit 1
+  fi
+  EXTRA_ARGS+=(costmap_common_params:="${COSTMAP_COMMON_PARAMS}")
+fi
+
+if [[ -n "${TREE_CIRCLES_JSON}" ]]; then
+  TREE_CIRCLES_JSON="$(python3 -c 'import os,sys; print(os.path.abspath(os.path.expanduser(sys.argv[1])))' "${TREE_CIRCLES_JSON}")"
+  if [[ ! -f "${TREE_CIRCLES_JSON}" ]]; then
+    echo "ERROR: TREE_CIRCLES_JSON not found: ${TREE_CIRCLES_JSON}" >&2
+    exit 1
+  fi
+  EXTRA_ARGS+=(circles_json:="${TREE_CIRCLES_JSON}")
+  if [[ -n "${TREE_CLEARANCE}" ]]; then
+    EXTRA_ARGS+=(tree_clearance:="${TREE_CLEARANCE}")
+  fi
+  if [[ -n "${TREE_DEFAULT_RADIUS}" ]]; then
+    EXTRA_ARGS+=(tree_default_radius:="${TREE_DEFAULT_RADIUS}")
+  fi
+fi
+
+if [[ -n "${GOAL_TIMEOUT_S}" ]]; then
+  EXTRA_ARGS+=(goal_timeout_s:="${GOAL_TIMEOUT_S}")
+fi
+
 exec roslaunch pcd_gazebo_world orchard_teb_replay.launch \
   gui:=false \
   gazebo_master_uri:="${GAZEBO_MASTER_URI}" \
-  gpu:=false organize_cloud:=false lidar_hz:=2 lidar_samples:=60 \
+  gpu:=false organize_cloud:=false lidar_hz:="${LIDAR_HZ}" lidar_samples:="${LIDAR_SAMPLES}" \
   controller_frequency:=5.0 planner_frequency:=2.0 local_costmap_update_frequency:=5.0 local_costmap_publish_frequency:=2.0 \
-  use_skid_steer:=false use_planar_move:=true \
+  use_skid_steer:="${USE_SKID_STEER}" use_planar_move:="${USE_PLANAR_MOVE}" \
   world_name:="${WORLD_FILE}" \
   path_file:="${PATH_JSON}" \
   record_csv:="${RECORD_CSV}" \
   use_via_points:="${USE_VIA_POINTS}" \
+  shutdown_on_path_done:="${SHUTDOWN_ON_PATH_DONE}" \
   "${EXTRA_ARGS[@]}"

@@ -1,0 +1,33 @@
+input_topic: "/bev_occ"
+output_path_topic: "/corridor_centerline"
+quality_topic: "/corridor_quality"
+clearance_topic: "/corridor_clearance_min"
+markers_topic: "/corridor_debug_markers"
+
+r_req: 0.38
+r_dil: 0.10
+r_gate: -1.0  # auto = max(0, r_req - r_dil)
+
+x_step: 0.1
+y_win: 0.5
+dy_max: 0.2
+smooth_tau: 0.3
+hold_time: 0.3
+q_th: 0.3
+min_valid_cols: 0
+quality_mode: "ratio"  # ratio | ratio_clearance
+center_y: 0.0
+center_bias: 1.0
+# Safety: if BEV has zero occupied cells (e.g. ROI empty / sensor dropout),
+# distance transform saturates and the controller may "fly" forward.
+min_occ_cells: 1
+reacquire_after_invalid: 0
+
+occ_threshold: 50
+unknown_as_obstacle: true
+
+line_width: 0.05
+point_size: 0.08
+marker_z: 0.05
+marker_lifetime: 0.2
+log_interval: 2.0

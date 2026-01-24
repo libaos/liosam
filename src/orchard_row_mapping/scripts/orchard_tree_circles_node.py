@@ -12,12 +12,17 @@ import csv
 import json
 import math
 import struct
+import threading
 from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 import numpy as np
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
+
 import rospy
 from geometry_msgs.msg import Point
 from sensor_msgs import point_cloud2 as pc2

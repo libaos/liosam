@@ -61,6 +61,7 @@ run_one() {
 run_one "teb_velodyne" bash "${WS_DIR}/src/pcd_gazebo_world/tools/run_orchard_teb_server.sh" "${PORT}" "${REF_JSON}" "${DEFAULT_WORLD_FILE}" velodyne
 run_one "teb_static_map" bash "${WS_DIR}/src/pcd_gazebo_world/tools/run_orchard_teb_server.sh" "${PORT}" "${REF_JSON}" "${DEFAULT_WORLD_FILE}" static_map
 run_one "teb_no_obstacles" bash "${WS_DIR}/src/pcd_gazebo_world/tools/run_orchard_teb_server.sh" "${PORT}" no_obstacles "${REF_JSON}" "${WS_DIR}/src/pcd_gazebo_world/worlds/empty_orchard.world"
+run_one "hybrid" bash "${WS_DIR}/src/pcd_gazebo_world/tools/run_orchard_hybrid_server.sh" "${PORT}" "${REF_JSON}" "${DEFAULT_WORLD_FILE}" velodyne
 run_one "pid" bash "${WS_DIR}/src/pcd_gazebo_world/tools/run_orchard_pid_server.sh" "${PORT}" "${REF_JSON}" "${DEFAULT_WORLD_FILE}"
 
 echo "[summary] metrics from *_report.json"

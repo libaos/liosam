@@ -2,8 +2,12 @@
 
 import math
 import os
+import threading
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 
 import actionlib
 import rosbag

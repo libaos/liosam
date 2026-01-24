@@ -15,8 +15,12 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import threading
 from pathlib import Path
 from typing import List, Optional, Tuple
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 
 import rospy
 import tf2_ros
@@ -184,7 +188,11 @@ class ViaPointsWindowPublisher:
             if rospy.Time.now().to_sec() - start > 10.0:
                 rospy.logwarn("publish_via_points_window: waiting for odom on %s ...", self.odom_topic)
                 start = rospy.Time.now().to_sec()
-            rospy.sleep(0.05)
+            try:
+                rospy.sleep(0.05)
+            except rospy.exceptions.ROSTimeMovedBackwardsException:
+                start = rospy.Time.now().to_sec()
+                continue
 
     def _wait_for_tf(self) -> None:
         if self.path_frame == self.local_frame:
@@ -198,7 +206,11 @@ class ViaPointsWindowPublisher:
             except Exception as exc:
                 if rospy.Time.now().to_sec() >= deadline:
                     raise RuntimeError(f"TF not available between {self.path_frame} and {self.local_frame}: {exc}") from exc
-                rospy.sleep(0.05)
+                try:
+                    rospy.sleep(0.05)
+                except rospy.exceptions.ROSTimeMovedBackwardsException:
+                    deadline = rospy.Time.now().to_sec() + self.wait_tf_s
+                    continue
 
     def run(self) -> None:
         self._wait_for_odom()
@@ -259,7 +271,10 @@ class ViaPointsWindowPublisher:
 
             msg = _build_path(self.local_frame, win)
             self._pub.publish(msg)
-            rate.sleep()
+            try:
+                rate.sleep()
+            except rospy.exceptions.ROSTimeMovedBackwardsException:
+                continue
 
 
 def main() -> int:
@@ -311,4 +326,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

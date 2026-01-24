@@ -10,7 +10,11 @@ Usage (with Gazebo running):
 from __future__ import annotations
 
 import argparse
+import threading
 from pathlib import Path
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 
 import cv2
 import rospy
@@ -52,4 +56,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

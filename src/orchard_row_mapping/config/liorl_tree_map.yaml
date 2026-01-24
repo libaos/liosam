@@ -14,7 +14,7 @@ num_classes: 2
 tree_class: 0
 
 # Keep more tree points (you can clean false positives later in CloudCompare)
-tree_prob_threshold: 0.5
+tree_prob_threshold: 0.0
 
 # Wider crop (still in incoming cloud frame, usually base_link_est)
 fit_x_min: 0.0
@@ -40,4 +40,3 @@ row_alpha: 1.0
 label_colors:
   "0": [56, 188, 75]
   "1": [180, 180, 180]
-

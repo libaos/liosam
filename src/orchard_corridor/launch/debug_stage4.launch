@@ -1,0 +1,134 @@
+<launch>
+  <arg name="points_topic" default="/points_raw" />
+  <arg name="tree_points_topic" default="/tree_points" />
+  <arg name="bev_occ_topic" default="/bev_occ" />
+  <arg name="centerline_topic" default="/corridor_centerline" />
+  <arg name="centerline_config" default="$(find orchard_corridor)/config/centerline.yaml" />
+  <arg name="boundary_markers_topic" default="/corridor_boundary_markers" />
+  <arg name="corridor_width_topic" default="/corridor_width" />
+  <arg name="route_id_topic" default="/route_id" />
+  <arg name="route_conf_topic" default="/route_conf" />
+  <arg name="route_id_stable_topic" default="/route_id_stable" />
+  <arg name="route_id_valid_topic" default="/route_id_valid" />
+
+  <arg name="use_nn_scancontext" default="false" />
+  <arg name="nn_cloud_topic" default="$(arg points_topic)" />
+  <arg name="nn_model_path" default="$(find orchard_nn_scancontext)/models/trajectory_localizer_simple2dcnn_acc97.5.pth" />
+  <arg name="nn_model_type" default="simple2dcnn" />
+  <arg name="nn_num_classes" default="20" />
+  <arg name="nn_process_hz" default="2.0" />
+  <arg name="nn_max_points" default="60000" />
+
+  <arg name="use_sc_route_db" default="false" />
+  <arg name="sc_cloud_topic" default="$(arg points_topic)" />
+  <arg name="sc_db_path" default="" />
+  <arg name="sc_metric" default="cosine" />
+  <arg name="sc_temperature" default="0.02" />
+  <arg name="sc_process_hz" default="2.0" />
+  <arg name="sc_max_points" default="60000" />
+  <arg name="sc_python_exec" default="$(optenv ROS_PYTHON_EXEC /usr/bin/python3)" />
+  <arg name="output_frame" default="base_link_est" />
+  <arg name="use_tf" default="true" />
+  <arg name="preprocess_config" default="$(find orchard_corridor)/config/pointcloud_preprocess.yaml" />
+  <arg name="bev_config" default="$(find orchard_corridor)/config/bev_occupancy.yaml" />
+  <arg name="use_randla" default="true" />
+  <arg name="randla_config" default="$(find orchard_row_mapping)/config/liorl_tree_map.yaml" />
+  <arg name="randla_env_prefix" default="$(optenv RANDLA_ENV_PREFIX /mysda/w/w/lio_ws/conda_envs/randla39)" />
+  <arg name="randla_pythonpath" default="$(arg randla_env_prefix)/lib/python3.9/site-packages" />
+  <arg name="randla_ld_library_path" default="$(arg randla_env_prefix)/lib" />
+  <arg name="randla_path" default="$(arg randla_env_prefix)/bin" />
+  <arg name="nn_python_exec" default="$(arg randla_path)/python3" />
+  <!-- Use ROS_PYTHON_EXEC if set, otherwise fallback to NN/RandLA env python. -->
+  <arg name="python_exec" default="$(eval optenv('ROS_PYTHON_EXEC', arg('nn_python_exec')))" />
+  <arg name="use_gpu" default="true" />
+  <arg name="output_dir" default="/mysda/w/w/lio_ws/output/debug_stage1" />
+  <arg name="launch_rviz" default="true" />
+  <arg name="rviz_config" default="$(find orchard_corridor)/rviz/debug_stage3.rviz" />
+  <arg name="publish_base_link_alias" default="true" />
+  <arg name="base_link_alias_parent" default="base_link_est" />
+  <arg name="base_link_alias_child" default="base_link" />
+
+  <arg name="gate_sync_slop" default="0.1" />
+  <arg name="gate_vote_window_scdb" default="5" />
+  <arg name="gate_vote_min_samples_scdb" default="3" />
+  <arg name="gate_vote_switch_ratio_scdb" default="0.7" />
+  <arg name="gate_allowed_jump_scdb" default="2" />
+  <arg name="gate_conf_th_scdb" default="0.6" />
+
+  <include file="$(find orchard_corridor)/launch/debug_stage3.launch">
+    <arg name="points_topic" value="$(arg points_topic)" />
+    <arg name="tree_points_topic" value="$(arg tree_points_topic)" />
+    <arg name="bev_occ_topic" value="$(arg bev_occ_topic)" />
+    <arg name="centerline_topic" value="$(arg centerline_topic)" />
+    <arg name="centerline_config" value="$(arg centerline_config)" />
+    <arg name="boundary_markers_topic" value="$(arg boundary_markers_topic)" />
+    <arg name="corridor_width_topic" value="$(arg corridor_width_topic)" />
+    <arg name="output_frame" value="$(arg output_frame)" />
+    <arg name="use_tf" value="$(arg use_tf)" />
+    <arg name="preprocess_config" value="$(arg preprocess_config)" />
+    <arg name="bev_config" value="$(arg bev_config)" />
+    <arg name="use_randla" value="$(arg use_randla)" />
+    <arg name="randla_config" value="$(arg randla_config)" />
+    <arg name="randla_env_prefix" value="$(arg randla_env_prefix)" />
+    <arg name="randla_pythonpath" value="$(arg randla_pythonpath)" />
+    <arg name="randla_ld_library_path" value="$(arg randla_ld_library_path)" />
+    <arg name="randla_path" value="$(arg randla_path)" />
+    <arg name="python_exec" value="$(arg python_exec)" />
+    <arg name="use_gpu" value="$(arg use_gpu)" />
+    <arg name="output_dir" value="$(arg output_dir)" />
+    <arg name="launch_rviz" value="false" />
+    <arg name="publish_base_link_alias" value="$(arg publish_base_link_alias)" />
+    <arg name="base_link_alias_parent" value="$(arg base_link_alias_parent)" />
+    <arg name="base_link_alias_child" value="$(arg base_link_alias_child)" />
+  </include>
+
+  <group if="$(eval str(arg('use_nn_scancontext')).lower() == 'true' and str(arg('use_sc_route_db')).lower() != 'true')">
+    <node pkg="orchard_nn_scancontext" type="nn_scancontext_node.py" name="nn_scancontext" output="screen" launch-prefix="$(arg python_exec)">
+      <env name="PATH" value="$(arg randla_path):$(optenv PATH)" />
+      <env name="PYTHONPATH" value="$(arg randla_pythonpath):$(optenv PYTHONPATH)" />
+      <env name="LD_LIBRARY_PATH" value="$(arg randla_ld_library_path):$(optenv LD_LIBRARY_PATH)" />
+
+      <param name="cloud_topic" value="$(arg nn_cloud_topic)" />
+      <param name="route_id_topic" value="$(arg route_id_topic)" />
+      <param name="route_conf_topic" value="$(arg route_conf_topic)" />
+      <param name="use_gpu" value="$(arg use_gpu)" />
+
+      <param name="process_hz" value="$(arg nn_process_hz)" />
+      <param name="max_points" value="$(arg nn_max_points)" />
+
+      <param name="model_path" value="$(arg nn_model_path)" />
+      <param name="model_type" value="$(arg nn_model_type)" />
+      <param name="num_classes" value="$(arg nn_num_classes)" />
+    </node>
+  </group>
+
+  <group if="$(eval str(arg('use_sc_route_db')).lower() == 'true' and str(arg('use_nn_scancontext')).lower() != 'true')">
+    <node pkg="orchard_nn_scancontext" type="sc_route_id_node.py" name="sc_route_id" output="screen" launch-prefix="$(arg sc_python_exec)">
+      <param name="cloud_topic" value="$(arg sc_cloud_topic)" />
+      <param name="route_id_topic" value="$(arg route_id_topic)" />
+      <param name="route_conf_topic" value="$(arg route_conf_topic)" />
+
+      <param name="db_path" value="$(arg sc_db_path)" />
+      <param name="process_hz" value="$(arg sc_process_hz)" />
+      <param name="max_points" value="$(arg sc_max_points)" />
+      <param name="metric" value="$(arg sc_metric)" />
+      <param name="temperature" value="$(arg sc_temperature)" />
+    </node>
+  </group>
+
+  <node pkg="orchard_corridor" type="route_id_gate_node.py" name="route_id_gate" output="screen" launch-prefix="$(arg python_exec)">
+    <rosparam command="load" file="$(find orchard_corridor)/config/route_id_gate.yaml" />
+    <param name="input_id_topic" value="$(arg route_id_topic)" />
+    <param name="input_conf_topic" value="$(arg route_conf_topic)" />
+    <param name="output_id_topic" value="$(arg route_id_stable_topic)" />
+    <param name="output_valid_topic" value="$(arg route_id_valid_topic)" />
+    <param name="sync_slop" value="$(arg gate_sync_slop)" />
+    <param if="$(arg use_sc_route_db)" name="conf_th" value="$(arg gate_conf_th_scdb)" />
+    <param if="$(arg use_sc_route_db)" name="allowed_jump" value="$(arg gate_allowed_jump_scdb)" />
+    <param if="$(arg use_sc_route_db)" name="vote_window" value="$(arg gate_vote_window_scdb)" />
+    <param if="$(arg use_sc_route_db)" name="vote_min_samples" value="$(arg gate_vote_min_samples_scdb)" />
+    <param if="$(arg use_sc_route_db)" name="vote_switch_ratio" value="$(arg gate_vote_switch_ratio_scdb)" />
+  </node>
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_config)" if="$(arg launch_rviz)" />
+</launch>

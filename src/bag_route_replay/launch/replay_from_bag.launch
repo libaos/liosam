@@ -14,8 +14,9 @@
   <arg name="loop" default="false" />
   <arg name="publish_path" default="true" />
   <arg name="transform_timeout" default="5.0" />
+  <arg name="python_exec" default="$(optenv ROS_PYTHON_EXEC /mysda/w/w/lio_ws/conda_envs/randla39/bin/python3)" />
 
-  <node pkg="bag_route_replay" type="bag_route_replay_node.py" name="bag_route_replay" output="screen">
+  <node pkg="bag_route_replay" type="bag_route_replay_node.py" name="bag_route_replay" output="screen" launch-prefix="$(arg python_exec)">
     <param name="bag_path" value="$(arg bag_path)" />
     <param name="path_topic" value="$(arg path_topic)" />
     <param name="action_name" value="$(arg action_name)" />

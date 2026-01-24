@@ -1,8 +1,17 @@
-<launch>
+  <launch>
   <arg name="config" default="$(find orchard_row_mapping)/config/default.yaml" />
+  <arg name="randla_env_prefix" default="$(optenv RANDLA_ENV_PREFIX /mysda/w/w/lio_ws/conda_envs/randla39)" />
+  <arg name="randla_pythonpath" default="$(arg randla_env_prefix)/lib/python3.9/site-packages" />
+  <arg name="randla_ld_library_path" default="$(arg randla_env_prefix)/lib" />
+  <arg name="randla_path" default="$(arg randla_env_prefix)/bin" />
+  <arg name="ros_ld_library_path" default="/mysda/w/w/lio_ws/devel/lib:/opt/ros/noetic/lib" />
+  <!-- Use ROS_PYTHON_EXEC if set, otherwise fallback to RandLA env python. -->
+  <arg name="python_exec" default="$(eval optenv('ROS_PYTHON_EXEC', arg('randla_path') + '/python3'))" />
 
-  <node pkg="orchard_row_mapping" type="orchard_segmentation_node.py" name="orchard_segmentation" output="screen">
-    <env name="PYTHONPATH" value="/mysda/w/w/lio_ws/.venv_orchard/lib/python3.8/site-packages:$(optenv PYTHONPATH)" />
+  <node pkg="orchard_row_mapping" type="orchard_segmentation_node.py" name="orchard_segmentation" output="screen" launch-prefix="$(arg python_exec)">
+    <env name="PATH" value="$(arg randla_path):$(optenv PATH)" />
+    <env name="PYTHONPATH" value="$(arg randla_pythonpath):$(optenv PYTHONPATH)" />
+    <env name="LD_LIBRARY_PATH" value="$(arg randla_ld_library_path):$(arg ros_ld_library_path)" />
     <rosparam file="$(arg config)" command="load" />
   </node>
 </launch>

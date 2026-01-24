@@ -7,8 +7,12 @@ import argparse
 import csv
 import json
 import math
+import threading
 from pathlib import Path
 from typing import List, Optional, Tuple
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 
 import rospy
 from gazebo_msgs.msg import ModelState, ModelStates

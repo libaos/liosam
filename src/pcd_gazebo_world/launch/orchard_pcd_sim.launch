@@ -10,14 +10,19 @@
   <arg name="spawn_robot" default="true"/>
   <arg name="enable_robot_state_publisher" default="false"/>
   <arg name="publish_static_sensor_tf" default="true"/>
-  <arg name="model_xacro" default="$(find scout_gazebo)/urdf/base_no_realsense.xacro"/>
+  <!-- Drive plugin selection: enabling both skid_steer + planar_move can make the robot "乱跑". -->
+  <arg name="use_skid_steer" default="false"/>
+  <arg name="use_planar_move" default="true"/>
+  <!-- When using skid_steer (physics), default to a tracked-looking model (still wheel-collision based). -->
+  <arg name="use_tracked_model" default="$(eval 'true' if arg('use_skid_steer') == 'true' and arg('use_planar_move') == 'false' else 'false')"/>
+
+  <arg name="model_xacro_wheeled" default="$(find scout_gazebo)/urdf/base_no_realsense.xacro"/>
+  <arg name="model_xacro_tracked" default="$(find scout_gazebo)/urdf/base_tracked_no_realsense.xacro"/>
+  <arg name="model_xacro" default="$(eval arg('model_xacro_tracked') if arg('use_tracked_model') == 'true' else arg('model_xacro_wheeled'))"/>
   <arg name="gpu" default="true"/>
   <arg name="organize_cloud" default="true"/>
   <arg name="lidar_hz" default="10"/>
   <arg name="lidar_samples" default="440"/>
-  <!-- Drive plugin selection: enabling both skid_steer + planar_move can make the robot "乱跑". -->
-  <arg name="use_skid_steer" default="false"/>
-  <arg name="use_planar_move" default="true"/>
   <arg name="x" default="0.0"/>
   <arg name="y" default="0.0"/>
   <arg name="z" default="0.2"/>

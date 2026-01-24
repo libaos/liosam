@@ -6,8 +6,12 @@ from __future__ import annotations
 import argparse
 import csv
 import math
+import threading
 from pathlib import Path
 from typing import List, Optional, Tuple
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 
 import rospy
 import tf2_ros
@@ -24,6 +28,7 @@ class Recorder:
         self,
         out_csv: Path,
         plan_csv: Optional[Path],
+        max_samples: int,
         min_dt: float,
         odom_topic: str,
         plan_topic: str,
@@ -32,10 +37,12 @@ class Recorder:
     ):
         self.out_csv = out_csv
         self.plan_csv = plan_csv
+        self.max_samples = max(0, int(max_samples))
         self.min_dt = float(min_dt)
         self.last_odom_time = 0.0
         self.odom_rows: List[Tuple[float, float, float, float]] = []
         self.plan_rows: List[Tuple[float, float, float, float]] = []
+        self._requested_shutdown = False
 
         self.output_frame = str(output_frame).strip()
         self.tf_timeout = float(tf_timeout)
@@ -90,6 +97,10 @@ class Recorder:
         except Exception:
             return
         self.odom_rows.append((t, x, y, float(yaw)))
+        if self.max_samples > 0 and len(self.odom_rows) >= self.max_samples and not self._requested_shutdown:
+            self._requested_shutdown = True
+            rospy.loginfo("record_trajectory: reached max samples (%d), stopping", self.max_samples)
+            rospy.signal_shutdown("max_samples reached")
 
     def _plan_cb(self, msg: NavPath) -> None:
         if not msg.poses:
@@ -126,6 +137,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Record /odom and optional planner path to CSV")
     parser.add_argument("--out", type=str, default="trajectory_data/pid_or_teb_odom.csv", help="输出 CSV (odom)")
     parser.add_argument("--plan-out", type=str, default="", help="可选输出 CSV (plan)")
+    parser.add_argument("--max-samples", type=int, default=0, help="最大采样点数（0=不限制）")
     parser.add_argument("--min-dt", type=float, default=0.05, help="最小采样间隔 (s)")
     parser.add_argument("--odom-topic", type=str, default="/odom")
     parser.add_argument("--plan-topic", type=str, default="", help="nav_msgs/Path 话题")
@@ -140,6 +152,7 @@ def main() -> int:
     Recorder(
         out_csv,
         plan_csv,
+        int(args.max_samples),
         float(args.min_dt),
         str(args.odom_topic),
         str(args.plan_topic),

@@ -20,8 +20,12 @@ import argparse
 import csv
 import json
 import math
+import threading
 from pathlib import Path
 from typing import List, Optional, Tuple
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 
 import rospy
 import tf2_ros
@@ -160,4 +164,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -1,0 +1,129 @@
+<launch>
+  <!-- LQR replay with map->odom alignment (so the recorded /odom can be compared in map). -->
+
+  <!-- Gazebo -->
+  <arg name="world_name" default="$(find pcd_gazebo_world)/worlds/orchard_from_pcd.world"/>
+  <arg name="paused" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gazebo_master_uri" default="$(optenv GAZEBO_MASTER_URI http://localhost:11345)"/>
+  <arg name="gazebo_ip" default="$(optenv GAZEBO_IP 127.0.0.1)"/>
+  <arg name="gpu" default="false"/>
+  <arg name="organize_cloud" default="false"/>
+  <arg name="lidar_hz" default="5"/>
+  <arg name="lidar_samples" default="120"/>
+  <arg name="use_skid_steer" default="false"/>
+  <arg name="use_planar_move" default="true"/>
+  <arg name="pub_clock_frequency" default="100"/>
+
+  <arg name="python_exec" default="$(optenv ROS_PYTHON_EXEC /mysda/w/w/lio_ws/conda_envs/randla39/bin/python3)" />
+
+  <!-- Reference path (map) -->
+  <arg name="path_file" default="$(find pcd_gazebo_world)/maps/runs/rosbag_path.json"/>
+  <arg name="path_frame" default="map"/>
+  <arg name="path_odom_topic" default="/reference_path_odom"/>
+
+  <!-- Robot spawn -->
+  <arg name="model_name" default="scout"/>
+  <arg name="path_index" default="0"/>
+  <arg name="spawn_z" default="$(eval 0.25749 if arg('use_skid_steer') == 'true' else 0.2)"/>
+
+  <!-- Frames -->
+  <arg name="global_frame" default="map"/>
+  <arg name="local_frame" default="odom"/>
+  <arg name="base_frame" default="base_link"/>
+  <arg name="odom_topic" default="/odom"/>
+
+  <!-- Follow-path goals (optional; used to auto-shutdown once the route is completed) -->
+  <arg name="goal_topic" default="/move_base_simple/goal"/>
+  <arg name="use_waypoint_goals" default="true"/>
+  <arg name="waypoint_min_dist" default="0.5"/>
+  <arg name="waypoint_tolerance" default="0.4"/>
+  <arg name="final_waypoint_tolerance" default="1.0"/>
+  <arg name="circles_json" default=""/>
+  <arg name="tree_clearance" default="0.30"/>
+  <arg name="tree_default_radius" default="0.15"/>
+  <arg name="goal_timeout_s" default="0.0"/>
+  <arg name="shutdown_on_path_done" default="false"/>
+
+  <!-- cmd_vel -->
+  <arg name="cmd_vel_topic" default="/cmd_vel"/>
+
+  <!-- LQR params -->
+  <arg name="lqr_v_max" default="0.45"/>
+  <arg name="lqr_v_min" default="0.05"/>
+  <arg name="lqr_max_omega" default="0.8"/>
+  <arg name="lqr_lookahead" default="0.8"/>
+  <arg name="lqr_k_dist" default="0.8"/>
+  <arg name="lqr_goal_tolerance" default="0.4"/>
+  <arg name="lqr_stop_at_goal" default="1"/>
+  <arg name="lqr_q_y" default="2.0"/>
+  <arg name="lqr_q_yaw" default="1.0"/>
+  <arg name="lqr_r_omega" default="0.5"/>
+  <arg name="lqr_iters" default="25"/>
+
+  <!-- Trajectory record -->
+  <arg name="record_csv" default="$(env PWD)/trajectory_data/lqr_odom_map.csv"/>
+
+  <param name="use_sim_time" value="$(arg use_sim_time)"/>
+
+  <include file="$(find pcd_gazebo_world)/launch/orchard_pcd_sim.launch">
+    <arg name="world_name" value="$(arg world_name)"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="gazebo_master_uri" value="$(arg gazebo_master_uri)"/>
+    <arg name="gazebo_ip" value="$(arg gazebo_ip)"/>
+    <arg name="gpu" value="$(arg gpu)"/>
+    <arg name="organize_cloud" value="$(arg organize_cloud)"/>
+    <arg name="lidar_hz" value="$(arg lidar_hz)"/>
+    <arg name="lidar_samples" value="$(arg lidar_samples)"/>
+    <arg name="use_skid_steer" value="$(arg use_skid_steer)"/>
+    <arg name="use_planar_move" value="$(arg use_planar_move)"/>
+    <arg name="pub_clock_frequency" value="$(arg pub_clock_frequency)"/>
+  </include>
+
+  <!-- Align map->odom using the path start pose and the first /odom message (Gazebo odom may start at 0,0). -->
+  <node pkg="pcd_gazebo_world" type="set_map_to_odom_from_path.py" name="set_map_to_odom" output="screen" launch-prefix="$(arg python_exec)"
+        args="--path $(arg path_file) --index $(arg path_index) --map-frame $(arg global_frame) --odom-frame $(arg local_frame) --odom-topic $(arg odom_topic) --wait 12"/>
+
+  <node pkg="pcd_gazebo_world" type="set_model_pose_from_path.py" name="set_model_pose" output="screen" launch-prefix="$(arg python_exec)"
+        args="--path $(arg path_file) --model $(arg model_name) --index $(arg path_index) --z $(arg spawn_z) --wait 12"/>
+
+  <!-- Publish the reference path in the local frame (follower expects same frame as odom). -->
+  <node pkg="pcd_gazebo_world" type="publish_path.py" name="publish_reference_path_odom" output="screen" launch-prefix="$(arg python_exec)"
+        args="--path $(arg path_file) --topic $(arg path_odom_topic) --frame-id $(arg path_frame) --target-frame $(arg local_frame) --tf-timeout 0.2 --wait-tf 12 --rate 0 --publish-goal 0"/>
+
+  <!-- Optional: publish intermediate goals as a completion monitor and auto-shutdown. -->
+  <node if="$(arg use_waypoint_goals)" pkg="pcd_gazebo_world" type="follow_path_goals.py" name="follow_path_goals" output="screen" launch-prefix="$(arg python_exec)"
+        required="$(arg shutdown_on_path_done)"
+        args="--path $(arg path_file) --frame-id $(arg path_frame) --goal-topic $(arg goal_topic) --odom-topic $(arg odom_topic) --min-dist $(arg waypoint_min_dist)">
+    <param name="wait_connections_s" value="0.0"/>
+    <param name="goal_tolerance" value="$(arg waypoint_tolerance)"/>
+    <param name="final_goal_tolerance" value="$(arg final_waypoint_tolerance)"/>
+    <param name="circles" value="$(arg circles_json)"/>
+    <param name="tree_clearance" value="$(arg tree_clearance)"/>
+    <param name="tree_default_radius" value="$(arg tree_default_radius)"/>
+    <param name="goal_timeout_s" value="$(arg goal_timeout_s)"/>
+  </node>
+
+  <node pkg="pcd_gazebo_world" type="lqr_path_follower.py" name="lqr_path_follower" output="screen" launch-prefix="$(arg python_exec)">
+    <param name="v_max" value="$(arg lqr_v_max)"/>
+    <param name="v_min" value="$(arg lqr_v_min)"/>
+    <param name="max_omega" value="$(arg lqr_max_omega)"/>
+    <param name="lookahead" value="$(arg lqr_lookahead)"/>
+    <param name="k_dist" value="$(arg lqr_k_dist)"/>
+    <param name="goal_tolerance" value="$(arg lqr_goal_tolerance)"/>
+    <param name="stop_at_goal" value="$(arg lqr_stop_at_goal)"/>
+    <param name="q_y" value="$(arg lqr_q_y)"/>
+    <param name="q_yaw" value="$(arg lqr_q_yaw)"/>
+    <param name="r_omega" value="$(arg lqr_r_omega)"/>
+    <param name="lqr_iters" value="$(arg lqr_iters)"/>
+    <param name="path_topic" value="$(arg path_odom_topic)"/>
+    <param name="odom_topic" value="$(arg odom_topic)"/>
+    <param name="cmd_vel_topic" value="$(arg cmd_vel_topic)"/>
+  </node>
+
+  <node pkg="pcd_gazebo_world" type="record_trajectory.py" name="record_trajectory" output="screen" launch-prefix="$(arg python_exec)"
+        args="--out $(arg record_csv) --odom-topic $(arg odom_topic) --output-frame $(arg global_frame) --tf-timeout 0.5"/>
+</launch>

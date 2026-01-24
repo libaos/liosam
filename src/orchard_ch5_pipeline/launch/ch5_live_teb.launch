@@ -40,13 +40,15 @@
   <arg name="route_start_nearest" default="true" />
   <arg name="route_goal_timeout" default="60.0" />
   <arg name="route_skip_failed" default="true" />
+  <arg name="python_exec" default="$(optenv ROS_PYTHON_EXEC /mysda/w/w/lio_ws/conda_envs/randla39/bin/python3)" />
 
   <include if="$(arg enable_orchard_segmentation)" file="$(find orchard_row_mapping)/launch/orchard_row_liorl_pretty.launch">
     <arg name="config" value="$(arg orchard_config)" />
+    <arg name="python_exec" value="$(arg python_exec)" />
   </include>
 
   <node if="$(arg enable_tree_clustering)" pkg="orchard_row_mapping" type="orchard_tree_clusters_node.py"
-        name="orchard_tree_clusters" output="screen">
+        name="orchard_tree_clusters" output="screen" launch-prefix="$(arg python_exec)">
     <param name="input_topic" value="$(arg tree_cluster_input)" />
     <param name="process_hz" value="$(arg tree_cluster_process_hz)" />
     <param name="z_min" value="$(arg tree_cluster_z_min)" />
@@ -58,11 +60,13 @@
   <include if="$(arg enable_scancontext)" file="$(find orchard_scancontext_fsm)/launch/scancontext_fsm.launch">
     <arg name="cloud_topic" value="$(arg cloud_topic)" />
     <arg name="mode_topic" value="$(arg mode_topic)" />
+    <arg name="python_exec" value="$(arg python_exec)" />
   </include>
 
   <include if="$(arg enable_teb_switcher)" file="$(find orchard_teb_mode_switcher)/launch/teb_mode_switcher.launch">
     <arg name="mode_topic" value="$(arg mode_topic)" />
     <arg name="teb_server" value="$(arg teb_server)" />
+    <arg name="python_exec" value="$(arg python_exec)" />
   </include>
 
   <include if="$(arg enable_move_base)" file="$(find orchard_ch5_pipeline)/launch/move_base_orchard_teb.launch">
@@ -87,6 +91,6 @@
     <arg name="start_nearest" value="$(arg route_start_nearest)" />
     <arg name="goal_timeout" value="$(arg route_goal_timeout)" />
     <arg name="skip_failed" value="$(arg route_skip_failed)" />
+    <arg name="python_exec" value="$(arg python_exec)" />
   </include>
 </launch>
-

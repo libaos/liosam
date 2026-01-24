@@ -4,8 +4,9 @@
   <arg name="default_profile" default="straight" />
   <arg name="apply_on_start" default="true" />
   <arg name="min_update_period_s" default="0.2" />
+  <arg name="python_exec" default="$(optenv ROS_PYTHON_EXEC /mysda/w/w/lio_ws/conda_envs/randla39/bin/python3)" />
 
-  <node pkg="orchard_teb_mode_switcher" type="teb_mode_switcher_node.py" name="teb_mode_switcher" output="screen">
+  <node pkg="orchard_teb_mode_switcher" type="teb_mode_switcher_node.py" name="teb_mode_switcher" output="screen" launch-prefix="$(arg python_exec)">
     <param name="mode_topic" value="$(arg mode_topic)" />
     <param name="teb_server" value="$(arg teb_server)" />
     <param name="default_profile" value="$(arg default_profile)" />
@@ -26,4 +27,3 @@
     </rosparam>
   </node>
 </launch>
-

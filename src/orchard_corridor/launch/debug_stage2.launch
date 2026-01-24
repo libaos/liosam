@@ -1,0 +1,57 @@
+<launch>
+  <arg name="points_topic" default="/points_raw" />
+  <arg name="tree_points_topic" default="/tree_points" />
+  <arg name="bev_occ_topic" default="/bev_occ" />
+  <arg name="centerline_topic" default="/corridor_centerline" />
+  <arg name="centerline_config" default="$(find orchard_corridor)/config/centerline.yaml" />
+  <arg name="output_frame" default="base_link_est" />
+  <arg name="use_tf" default="true" />
+  <arg name="preprocess_config" default="$(find orchard_corridor)/config/pointcloud_preprocess.yaml" />
+  <arg name="bev_config" default="$(find orchard_corridor)/config/bev_occupancy.yaml" />
+  <arg name="use_randla" default="true" />
+  <arg name="randla_config" default="$(find orchard_row_mapping)/config/liorl_tree_map.yaml" />
+  <arg name="randla_env_prefix" default="$(optenv RANDLA_ENV_PREFIX /mysda/w/w/lio_ws/conda_envs/randla39)" />
+  <arg name="randla_pythonpath" default="$(arg randla_env_prefix)/lib/python3.9/site-packages" />
+  <arg name="randla_ld_library_path" default="$(arg randla_env_prefix)/lib" />
+  <arg name="randla_path" default="$(arg randla_env_prefix)/bin" />
+  <!-- Use ROS_PYTHON_EXEC if set, otherwise fallback to RandLA env python. -->
+  <arg name="python_exec" default="$(eval optenv('ROS_PYTHON_EXEC', arg('randla_path') + '/python3'))" />
+  <arg name="use_gpu" default="true" />
+  <arg name="output_dir" default="/mysda/w/w/lio_ws/output/debug_stage1" />
+  <arg name="launch_rviz" default="true" />
+  <arg name="rviz_config" default="$(find orchard_corridor)/rviz/debug_stage2.rviz" />
+  <arg name="publish_base_link_alias" default="true" />
+  <arg name="base_link_alias_parent" default="base_link_est" />
+  <arg name="base_link_alias_child" default="base_link" />
+
+  <include file="$(find orchard_corridor)/launch/debug_stage1.launch">
+    <arg name="points_topic" value="$(arg points_topic)" />
+    <arg name="tree_points_topic" value="$(arg tree_points_topic)" />
+    <arg name="bev_occ_topic" value="$(arg bev_occ_topic)" />
+    <arg name="output_frame" value="$(arg output_frame)" />
+    <arg name="use_tf" value="$(arg use_tf)" />
+    <arg name="preprocess_config" value="$(arg preprocess_config)" />
+    <arg name="bev_config" value="$(arg bev_config)" />
+    <arg name="use_randla" value="$(arg use_randla)" />
+    <arg name="randla_config" value="$(arg randla_config)" />
+    <arg name="randla_env_prefix" value="$(arg randla_env_prefix)" />
+    <arg name="randla_pythonpath" value="$(arg randla_pythonpath)" />
+    <arg name="randla_ld_library_path" value="$(arg randla_ld_library_path)" />
+    <arg name="randla_path" value="$(arg randla_path)" />
+    <arg name="python_exec" value="$(arg python_exec)" />
+    <arg name="use_gpu" value="$(arg use_gpu)" />
+    <arg name="output_dir" value="$(arg output_dir)" />
+    <arg name="launch_rviz" value="false" />
+    <arg name="publish_base_link_alias" value="$(arg publish_base_link_alias)" />
+    <arg name="base_link_alias_parent" value="$(arg base_link_alias_parent)" />
+    <arg name="base_link_alias_child" value="$(arg base_link_alias_child)" />
+  </include>
+
+  <node pkg="orchard_corridor" type="centerline_node.py" name="centerline" output="screen" launch-prefix="$(arg python_exec)">
+    <rosparam command="load" file="$(arg centerline_config)" />
+    <param name="input_topic" value="$(arg bev_occ_topic)" />
+    <param name="output_path_topic" value="$(arg centerline_topic)" />
+  </node>
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_config)" if="$(arg launch_rviz)" />
+</launch>

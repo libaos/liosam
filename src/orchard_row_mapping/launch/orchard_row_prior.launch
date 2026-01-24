@@ -27,8 +27,9 @@
   <arg name="row_cluster_gap" default="0.8" />
   <arg name="min_points_per_row" default="200" />
   <arg name="line_length" default="20.0" />
+  <arg name="python_exec" default="$(optenv ROS_PYTHON_EXEC /mysda/w/w/lio_ws/conda_envs/randla39/bin/python3)" />
 
-  <node pkg="orchard_row_mapping" type="orchard_row_prior_node.py" name="orchard_row_prior" output="screen">
+  <node pkg="orchard_row_mapping" type="orchard_row_prior_node.py" name="orchard_row_prior" output="screen" launch-prefix="$(arg python_exec)">
     <rosparam file="$(arg config)" command="load" />
     <param name="pcd_path" value="$(arg pcd_path)" />
     <param name="row_model_file" value="$(arg row_model_file)" />

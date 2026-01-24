@@ -1,0 +1,209 @@
+<launch>
+  <!-- Hybrid replay: follow rosbag reference path with PID on straights, switch to move_base+TEB on turns. -->
+
+  <!-- Gazebo -->
+  <arg name="world_name" default="$(find pcd_gazebo_world)/worlds/orchard_from_pcd.world"/>
+  <arg name="paused" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gazebo_master_uri" default="$(optenv GAZEBO_MASTER_URI http://localhost:11345)"/>
+  <arg name="gazebo_ip" default="$(optenv GAZEBO_IP 127.0.0.1)"/>
+  <arg name="gpu" default="false"/>
+  <arg name="organize_cloud" default="false"/>
+  <arg name="lidar_hz" default="5"/>
+  <arg name="lidar_samples" default="120"/>
+  <arg name="use_skid_steer" default="false"/>
+  <arg name="use_planar_move" default="true"/>
+  <arg name="pub_clock_frequency" default="100"/>
+
+  <!-- Frequencies (move_base + costmaps) -->
+  <arg name="planner_frequency" default="2.0"/>
+  <arg name="controller_frequency" default="5.0"/>
+  <arg name="local_costmap_update_frequency" default="5.0"/>
+  <arg name="local_costmap_publish_frequency" default="2.0"/>
+
+  <!-- Python exec -->
+  <arg name="python_exec" default="$(optenv ROS_PYTHON_EXEC /mysda/w/w/lio_ws/conda_envs/randla39/bin/python3)" />
+
+  <!-- Reference path -->
+  <arg name="path_file" default="$(find pcd_gazebo_world)/maps/runs/rosbag_path.json"/>
+  <arg name="path_frame" default="map"/>
+  <arg name="path_odom_topic" default="/reference_path_odom"/>
+
+  <!-- Goals for move_base -->
+  <arg name="goal_topic" default="/move_base_simple/goal"/>
+  <arg name="use_waypoint_goals" default="true"/>
+  <arg name="waypoint_min_dist" default="0.5"/>
+  <arg name="waypoint_tolerance" default="0.35"/>
+  <arg name="circles_json" default=""/>
+  <arg name="tree_clearance" default="0.30"/>
+  <arg name="tree_default_radius" default="0.15"/>
+  <arg name="goal_timeout_s" default="0.0"/>
+  <arg name="shutdown_on_path_done" default="false"/>
+
+  <!-- Optional: TEB via-points (experimental; disabled by default) -->
+  <arg name="via_points_topic" default="/move_base_benchmark/TebLocalPlannerROS/via_points"/>
+  <arg name="use_via_points" default="false"/>
+
+  <!-- Robot spawn -->
+  <arg name="model_name" default="scout"/>
+  <arg name="path_index" default="0"/>
+  <arg name="spawn_z" default="$(eval 0.25749 if arg('use_skid_steer') == 'true' else 0.2)"/>
+
+  <!-- Nav / frames -->
+  <arg name="map_yaml" default="$(find pcd_gazebo_world)/maps/orchard_from_pcd_validated_by_bag/map.yaml"/>
+  <arg name="costmap_common_params" default="$(find pcd_gazebo_world)/config/orchard_costmap_common_velodyne.yaml"/>
+  <arg name="global_costmap_params" default="$(find move_base_benchmark)/params/global_costmap_params.yaml"/>
+  <arg name="local_costmap_params" default="$(find move_base_benchmark)/params/orchard_local_costmap_params.yaml"/>
+  <arg name="local_planner_params" default="$(find move_base_benchmark)/params/orchard_teb_local_planner_params.yaml"/>
+  <arg name="local_planner_override_params" default="$(find pcd_gazebo_world)/config/teb_via_points_override.yaml"/>
+
+  <arg name="global_frame" default="map"/>
+  <arg name="local_frame" default="odom"/>
+  <arg name="base_frame" default="base_link"/>
+  <arg name="odom_topic" default="/odom"/>
+
+  <!-- cmd_vel topics -->
+  <arg name="cmd_vel_topic" default="/cmd_vel"/>
+  <arg name="pid_cmd_vel_topic" default="/cmd_vel_pid"/>
+  <arg name="teb_cmd_vel_topic" default="/cmd_vel_teb"/>
+
+  <!-- PID params -->
+  <arg name="pid_kp" default="1.6"/>
+  <arg name="pid_ki" default="0.0"/>
+  <arg name="pid_kd" default="0.15"/>
+  <arg name="pid_v_max" default="0.45"/>
+  <arg name="pid_v_min" default="0.05"/>
+  <arg name="pid_max_omega" default="0.8"/>
+  <arg name="pid_lookahead" default="0.8"/>
+  <arg name="pid_k_dist" default="0.8"/>
+  <arg name="pid_goal_tolerance" default="0.4"/>
+  <arg name="pid_stop_at_goal" default="0"/>
+
+  <!-- Hybrid switching params -->
+  <arg name="hybrid_mode" default="auto"/> <!-- auto|pid|teb -->
+  <arg name="hybrid_lookahead_dist_m" default="3.0"/>
+  <arg name="hybrid_turn_enter_yaw" default="0.35"/>
+  <arg name="hybrid_turn_exit_yaw" default="0.25"/>
+  <arg name="hybrid_min_hold_s" default="1.0"/>
+  <arg name="hybrid_source_timeout_s" default="0.5"/>
+  <arg name="hybrid_publish_rate_hz" default="20.0"/>
+
+  <!-- Trajectory record -->
+  <arg name="record_csv" default="$(env PWD)/trajectory_data/hybrid_odom.csv"/>
+
+  <param name="use_sim_time" value="$(arg use_sim_time)"/>
+
+  <include file="$(find pcd_gazebo_world)/launch/orchard_pcd_sim.launch">
+    <arg name="world_name" value="$(arg world_name)"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="gazebo_master_uri" value="$(arg gazebo_master_uri)"/>
+    <arg name="gazebo_ip" value="$(arg gazebo_ip)"/>
+    <arg name="gpu" value="$(arg gpu)"/>
+    <arg name="organize_cloud" value="$(arg organize_cloud)"/>
+    <arg name="lidar_hz" value="$(arg lidar_hz)"/>
+    <arg name="lidar_samples" value="$(arg lidar_samples)"/>
+    <arg name="use_skid_steer" value="$(arg use_skid_steer)"/>
+    <arg name="use_planar_move" value="$(arg use_planar_move)"/>
+    <arg name="pub_clock_frequency" value="$(arg pub_clock_frequency)"/>
+  </include>
+
+  <!-- Align map->odom using the path start pose and the first /odom message (Gazebo odom may start at 0,0). -->
+  <node pkg="pcd_gazebo_world" type="set_map_to_odom_from_path.py" name="set_map_to_odom" output="screen" launch-prefix="$(arg python_exec)"
+        args="--path $(arg path_file) --index $(arg path_index) --map-frame $(arg global_frame) --odom-frame $(arg local_frame) --odom-topic $(arg odom_topic) --wait 12"/>
+
+  <node pkg="pcd_gazebo_world" type="set_model_pose_from_path.py" name="set_model_pose" output="screen" launch-prefix="$(arg python_exec)"
+        args="--path $(arg path_file) --model $(arg model_name) --index $(arg path_index) --z $(arg spawn_z) --wait 12"/>
+
+  <!-- Publish the reference path in the local frame (PID follower expects same frame as odom). -->
+  <node pkg="pcd_gazebo_world" type="publish_path.py" name="publish_reference_path_odom" output="screen" launch-prefix="$(arg python_exec)"
+        args="--path $(arg path_file) --topic $(arg path_odom_topic) --frame-id $(arg path_frame) --target-frame $(arg local_frame) --tf-timeout 0.2 --wait-tf 12 --rate 0 --publish-goal 0"/>
+
+  <!-- PID follower (writes to pid_cmd_vel_topic). -->
+  <node pkg="pcd_gazebo_world" type="pid_path_follower.py" name="pid_path_follower" output="screen" launch-prefix="$(arg python_exec)">
+    <param name="kp" value="$(arg pid_kp)"/>
+    <param name="ki" value="$(arg pid_ki)"/>
+    <param name="kd" value="$(arg pid_kd)"/>
+    <param name="v_max" value="$(arg pid_v_max)"/>
+    <param name="v_min" value="$(arg pid_v_min)"/>
+    <param name="max_omega" value="$(arg pid_max_omega)"/>
+    <param name="lookahead" value="$(arg pid_lookahead)"/>
+    <param name="k_dist" value="$(arg pid_k_dist)"/>
+    <param name="goal_tolerance" value="$(arg pid_goal_tolerance)"/>
+    <param name="stop_at_goal" value="$(arg pid_stop_at_goal)"/>
+    <param name="path_topic" value="$(arg path_odom_topic)"/>
+    <param name="odom_topic" value="$(arg odom_topic)"/>
+    <param name="cmd_vel_topic" value="$(arg pid_cmd_vel_topic)"/>
+  </node>
+
+  <!-- move_base + TEB (writes to teb_cmd_vel_topic). -->
+  <node pkg="move_base_benchmark" type="move_base_benchmark" respawn="false" name="move_base_benchmark" output="screen">
+    <rosparam file="$(arg costmap_common_params)" command="load" ns="global_costmap"/>
+    <rosparam file="$(arg costmap_common_params)" command="load" ns="local_costmap"/>
+    <rosparam file="$(arg global_costmap_params)" command="load"/>
+    <rosparam file="$(arg local_costmap_params)" command="load"/>
+
+    <param name="global_costmap/global_frame" value="$(arg global_frame)"/>
+    <param name="local_costmap/global_frame" value="$(arg local_frame)"/>
+    <param name="global_costmap/robot_base_frame" value="$(arg base_frame)"/>
+    <param name="local_costmap/robot_base_frame" value="$(arg base_frame)"/>
+
+    <param name="base_global_planner" value="navfn/NavfnROS"/>
+    <param name="planner_frequency" value="$(arg planner_frequency)"/>
+    <param name="planner_patience" value="5.0"/>
+
+    <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS"/>
+    <rosparam file="$(arg local_planner_params)" command="load"/>
+    <rosparam file="$(arg local_planner_override_params)" command="load"/>
+    <param name="controller_frequency" value="$(arg controller_frequency)"/>
+    <param name="controller_patience" value="15.0"/>
+
+    <param name="local_costmap/update_frequency" value="$(arg local_costmap_update_frequency)"/>
+    <param name="local_costmap/publish_frequency" value="$(arg local_costmap_publish_frequency)"/>
+
+    <remap from="odom" to="$(arg odom_topic)"/>
+    <remap from="cmd_vel" to="$(arg teb_cmd_vel_topic)"/>
+  </node>
+
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_yaml)" output="screen">
+    <param name="frame_id" value="$(arg global_frame)"/>
+  </node>
+
+  <!-- Publish a short window of custom via-points (teb_local_planner does not TF-transform them). -->
+  <node if="$(arg use_via_points)" pkg="pcd_gazebo_world" type="publish_via_points_window.py" name="publish_via_points" output="screen" launch-prefix="$(arg python_exec)"
+        args="--path $(arg path_file) --topic $(arg via_points_topic) --odom-topic $(arg odom_topic) --path-frame $(arg path_frame) --local-frame $(arg local_frame) --rate 5.0 --window-dist 3.0 --min-sep 0.5 --max-points 12"/>
+
+  <!-- Publish intermediate goals so move_base traverses loop-like paths. -->
+  <node if="$(arg use_waypoint_goals)" pkg="pcd_gazebo_world" type="follow_path_goals.py" name="follow_path_goals" output="screen" launch-prefix="$(arg python_exec)"
+        required="$(arg shutdown_on_path_done)"
+        args="--path $(arg path_file) --frame-id $(arg path_frame) --goal-topic $(arg goal_topic) --odom-topic $(arg odom_topic) --min-dist $(arg waypoint_min_dist)">
+    <param name="goal_tolerance" value="$(arg waypoint_tolerance)"/>
+    <!-- Loop-like paths may not end exactly at the start; keep the final goal tolerance looser so benchmarks can finish. -->
+    <param name="final_goal_tolerance" value="1.0"/>
+    <param name="circles" value="$(arg circles_json)"/>
+    <param name="tree_clearance" value="$(arg tree_clearance)"/>
+    <param name="tree_default_radius" value="$(arg tree_default_radius)"/>
+    <param name="goal_timeout_s" value="$(arg goal_timeout_s)"/>
+  </node>
+
+  <!-- Hybrid cmd_vel mux (selects PID/TEB and publishes cmd_vel_topic). -->
+  <node pkg="pcd_gazebo_world" type="hybrid_cmd_vel_mux.py" name="hybrid_cmd_vel_mux" output="screen" launch-prefix="$(arg python_exec)">
+    <param name="mode" value="$(arg hybrid_mode)"/>
+    <param name="cmd_vel_out_topic" value="$(arg cmd_vel_topic)"/>
+    <param name="pid_cmd_vel_topic" value="$(arg pid_cmd_vel_topic)"/>
+    <param name="teb_cmd_vel_topic" value="$(arg teb_cmd_vel_topic)"/>
+    <param name="path_topic" value="$(arg path_odom_topic)"/>
+    <param name="odom_topic" value="$(arg odom_topic)"/>
+    <param name="lookahead_dist_m" value="$(arg hybrid_lookahead_dist_m)"/>
+    <param name="turn_enter_yaw" value="$(arg hybrid_turn_enter_yaw)"/>
+    <param name="turn_exit_yaw" value="$(arg hybrid_turn_exit_yaw)"/>
+    <param name="min_hold_s" value="$(arg hybrid_min_hold_s)"/>
+    <param name="source_timeout_s" value="$(arg hybrid_source_timeout_s)"/>
+    <param name="publish_rate_hz" value="$(arg hybrid_publish_rate_hz)"/>
+  </node>
+
+  <node pkg="pcd_gazebo_world" type="record_trajectory.py" name="record_trajectory" output="screen" launch-prefix="$(arg python_exec)"
+        args="--out $(arg record_csv) --odom-topic $(arg odom_topic) --output-frame $(arg global_frame) --tf-timeout 0.5"/>
+</launch>

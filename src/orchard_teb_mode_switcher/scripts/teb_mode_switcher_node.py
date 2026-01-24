@@ -11,7 +11,11 @@ restarting move_base.
 
 from __future__ import annotations
 
+import threading
 from typing import Any, Dict, Optional, Tuple
+
+if not hasattr(threading.Thread, "isAlive"):
+    setattr(threading.Thread, "isAlive", threading.Thread.is_alive)
 
 import rospy
 from dynamic_reconfigure.client import Client as DynClient
@@ -119,4 +123,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

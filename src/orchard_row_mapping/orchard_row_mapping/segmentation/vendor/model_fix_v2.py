@@ -5,12 +5,88 @@ import logging
 # 配置日志
 logger = logging.getLogger(__name__)
 
-# 尝试导入 torch_points_kernels,如果失败则使用简单实现
+# Try torch_points_kernels for fast KNN; fall back to other GPU paths and pure PyTorch.
 try:
-    from torch_points_kernels import knn
-except ImportError:
-    logger.warning("torch_points_kernels 未安装，使用简单 KNN 实现（性能可能较慢）")
-    from .simple_knn import knn
+    from torch_points_kernels import knn as tpk_knn
+    _TPK_AVAILABLE = True
+except Exception:
+    tpk_knn = None
+    _TPK_AVAILABLE = False
+    logger.warning(
+        "torch_points_kernels not available; will try torch_cluster for GPU KNN and fall back to simple KNN."
+    )
+
+try:
+    from torch_cluster import knn as tc_knn
+    _TC_AVAILABLE = True
+except Exception:
+    tc_knn = None
+    _TC_AVAILABLE = False
+
+from .simple_knn import knn as simple_knn
+
+
+def _torch_cluster_knn(pos_support, pos, k):
+    """KNN via torch_cluster; returns (idx, dist2) like torch_points_kernels."""
+    if tc_knn is None:
+        raise RuntimeError("torch_cluster is unavailable")
+    if pos_support.dim() != 3 or pos.dim() != 3:
+        raise ValueError("pos_support/pos must be (B, N, 3) and (B, M, 3)")
+
+    batch_size, n_support, _ = pos_support.shape
+    n_query = pos.shape[1]
+    device = pos_support.device
+
+    x = pos_support.reshape(batch_size * n_support, 3)
+    y = pos.reshape(batch_size * n_query, 3)
+    batch_x = torch.arange(batch_size, device=device).repeat_interleave(n_support)
+    batch_y = torch.arange(batch_size, device=device).repeat_interleave(n_query)
+
+    row, col = tc_knn(x, y, k, batch_x=batch_x, batch_y=batch_y)
+    if row.numel() != batch_size * n_query * k:
+        raise RuntimeError("torch_cluster knn returned unexpected edge count")
+
+    order = row.argsort()
+    row = row[order]
+    col = col[order]
+
+    idx = (col % n_support).view(batch_size, n_query, k)
+    neigh = x[col].view(batch_size * n_query, k, 3)
+    centers = y[row].view(batch_size * n_query, k, 3)
+    dist2 = (neigh - centers).pow(2).sum(dim=-1).view(batch_size, n_query, k)
+    return idx, dist2
+
+
+def _knn_with_fallback(pos_support, pos, k):
+    """Run KNN on the current device; fall back if CUDA kernels are unavailable."""
+    global _TPK_AVAILABLE, _TC_AVAILABLE
+
+    if _TPK_AVAILABLE and pos_support.is_cuda:
+        try:
+            return tpk_knn(pos_support, pos, k)
+        except Exception as exc:
+            # Disable torch_points_kernels after the first runtime failure to avoid
+            # exception overhead + log spam inside the forward pass.
+            _TPK_AVAILABLE = False
+            logger.warning("torch_points_kernels knn failed on %s: %s", pos_support.device, exc)
+
+    if _TC_AVAILABLE and pos_support.is_cuda:
+        try:
+            return _torch_cluster_knn(pos_support, pos, k)
+        except Exception as exc:
+            # Same idea: disable after first failure to keep logs clean.
+            _TC_AVAILABLE = False
+            logger.warning("torch_cluster knn failed on %s: %s", pos_support.device, exc)
+    try:
+        return simple_knn(pos_support, pos, k)
+    except RuntimeError as exc:
+        if pos_support.is_cuda:
+            logger.warning("simple_knn failed on CUDA (%s); retrying on CPU", exc)
+            pos_support_cpu = pos_support.detach().cpu()
+            pos_cpu = pos.detach().cpu()
+            idx, dist = simple_knn(pos_support_cpu, pos_cpu, k)
+            return idx.to(pos_support.device), dist.to(pos_support.device)
+        raise
 
 class SharedMLP(nn.Module):
     def __init__(
@@ -180,13 +256,13 @@ class LocalFeatureAggregation(nn.Module):
             -------
             torch.Tensor, shape (B, 2*d_out, N, 1)
         """
-        # 确保坐标在CPU上执行KNN
-        coords_cpu = coords.cpu().contiguous()
+        # Keep KNN on the same device to enable CUDA acceleration when available.
+        coords_knn = coords.contiguous()
         
         try:
             # 尝试使用标准KNN函数
             # 使用安全的KNN调用方式
-            knn_output = knn(coords_cpu, coords_cpu, self.num_neighbors)
+            knn_output = _knn_with_fallback(coords_knn, coords_knn, self.num_neighbors)
             # 将结果移回到与特征相同的设备上
             if isinstance(knn_output, tuple):
                 idx = knn_output[0].to(features.device)
@@ -200,7 +276,7 @@ class LocalFeatureAggregation(nn.Module):
                 B, N, K = idx.size()
                 dist = torch.ones((B, N, K), device=features.device)
         except Exception as e:
-            print(f"KNN计算出错: {e}, 使用备用方法")
+            logger.warning("KNN calculation failed: %s; using fallback indices", e)
             # 备用方法：简单地使用最近的点
             B, N, _ = coords.shape
             idx = torch.arange(N, device=features.device).view(1, N, 1).repeat(B, 1, self.num_neighbors)
@@ -308,19 +384,19 @@ class RandLANet(nn.Module):
 
         # <<<<<<<<<< DECODER
         for mlp in self.decoder:
-            # 在CPU上执行KNN计算，然后将结果移动到正确的设备
-            coords_cpu_current = coords[:,:N//decimation_ratio].cpu().contiguous()
-            coords_cpu_upsampled = coords[:,:d*N//decimation_ratio].cpu().contiguous()
+            # Keep KNN on the same device as coords when possible.
+            coords_current = coords[:,:N//decimation_ratio].contiguous()
+            coords_upsampled = coords[:,:d*N//decimation_ratio].contiguous()
             
             try:
                 # 使用安全的KNN调用方式
-                knn_output = knn(coords_cpu_current, coords_cpu_upsampled, 1)
+                knn_output = _knn_with_fallback(coords_current, coords_upsampled, 1)
                 if isinstance(knn_output, tuple):
                     neighbors = knn_output[0].to(input.device)
                 else:
                     neighbors = knn_output.to(input.device)
             except Exception as e:
-                print(f"解码器KNN计算出错: {e}, 使用备用方法")
+                logger.warning("Decoder KNN failed: %s; using fallback indices", e)
                 B = coords.shape[0]
                 neighbors = torch.zeros((B, N//decimation_ratio, 1), dtype=torch.long, device=input.device)
 

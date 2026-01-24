@@ -14,6 +14,13 @@ ROS 节点：订阅原始点云 (`sensor_msgs/PointCloud2`)，调用 `noslam` �
 - PyTorch（与 noslam 项目相同版本即可）
 - RandLA-Net 权重文件，例如 `/mysda/w/w/RandLA-Net-pytorch/noslam/checkpoints/best_model.pth`
 
+推荐（统一环境）：
+- 使用 conda 环境 `conda_envs/randla39`（推荐：`source tools/ros_py39/setup.bash`）
+- 统一说明见：`docs/conda_env.md`
+
+## GPU 说明
+`orchard_segmentation_node.py` 会在 `use_gpu` 且 `torch.cuda.is_available()` 为 true 时启用 CUDA。相关 launch 已增加 `randla_env_prefix`（或环境变量 `RANDLA_ENV_PREFIX`）用于指定 Python 环境前缀，默认 `/mysda/w/w/lio_ws/conda_envs/randla39`。
+
 ## 目录说明
 ```
 orchard_row_mapping/
@@ -70,6 +77,28 @@ mkdir -p /mysda/w/w/lio_ws/maps
   _fixed_frame:=map _binary:=true _compressed:=false
 ```
 然后用 CloudCompare 打开 `tree_cloud.pcd` 继续裁剪/清理，再把清理后的 PCD 作为 `orchard_row_prior.launch` 的 `pcd_path` 先验即可。
+
+## 离线导出链路（推荐：先把整条链路跑通）
+
+如果你希望从 rosbag 一次性导出：
+
+- 原始点云帧（raw）
+- 识别树点帧（tree）
+- 原始点云上色（colored：全点 + rgb/label）
+- 5/10 帧合成的 map PCD（TF 对齐）
+- chunk(tree) 的多算法聚类 + BEV 圆圈预览 + 对比拼图
+
+可以直接用一键脚本（全部中文目录输出）：
+
+```bash
+python3 src/orchard_row_mapping/tools/run_bag_export_chain.py \
+  --bag /mysda/w/w/lio_ws/rosbags/2025-10-29-16-05-00.bag \
+  --points-topic /liorl/deskew/cloud_deskewed \
+  --use-gpu \
+  --enable-kmeans-merge
+```
+
+跑完后从输出根目录的 `00_导航/` 进入即可（都是软链接，不占空间）。
 
 ## 重要参数
 | 参数 | 说明 |

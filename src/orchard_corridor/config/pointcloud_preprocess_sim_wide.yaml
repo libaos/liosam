@@ -1,0 +1,19 @@
+input_topic: "/velodyne_points"
+output_topic: "/pc_roi"
+output_frame: "base_link"
+use_tf: true
+
+# Sim (Gazebo) wide/robust defaults:
+# - Keep ROI wider so tree returns don't disappear when slightly off-center
+# - Increase z_max to keep canopy returns (avoid /pc_roi becoming empty)
+# - Keep a small negative z_min margin so low trunk returns are kept, while still rejecting most ground hits.
+roi_x_min: 0.0
+roi_x_max: 25.0
+roi_y_min: -8.0
+roi_y_max: 8.0
+z_min: -0.15
+z_max: 3.0
+min_range: 0.5
+voxel: 0.05
+
+log_interval: 2.0
